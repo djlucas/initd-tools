@@ -23,3 +23,9 @@ dstring_t *d_string_new(const char *init)
 out:
 	return new;
 }
+
+void d_string_free(dstring_t *str) {
+	free(str->str);
+	free(str);
+	str = NULL;
+}

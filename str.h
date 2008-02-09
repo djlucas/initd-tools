@@ -6,4 +6,5 @@ typedef struct dstring {
 	size_t len;
 } dstring_t;
 
-dstring_t *d_string_new(const char *new);
+extern dstring_t *d_string_new(const char *new);
+extern void d_string_free(dstring_t *str);

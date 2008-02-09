@@ -6,7 +6,9 @@ int main(int argc, char *argv[])
 	dstring_t *foo = d_string_new("hello world");
 	if (!foo)
 		return 1;
-
 	printf("String '%s' has '%d' characters\n", foo->str, foo->len);
+
+	d_string_free(foo);
+
 	return 0;
 }
