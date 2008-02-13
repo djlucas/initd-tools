@@ -21,6 +21,9 @@ dep_t *dep_new(const char *name) {
 		error(2, errno, "%s", __FUNCTION__);
 	*new->deps = NULL;
 
+	new->prev = NULL;
+	new->next = NULL;
+
 	return new;
 }
 
