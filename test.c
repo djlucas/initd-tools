@@ -12,6 +12,10 @@ int main(int argc, char *argv[])
 	printf("String '%s' has '%d' characters\n", foo, strlen(foo));
 	printf("foo has size '%d'\n", sizeof(*foo) * strlen(foo));
 
+	d_string_append(foo, "");
+	printf("String '%s' has '%d' characters\n", foo, strlen(foo));
+	printf("foo has size '%d'\n", sizeof(*foo) * strlen(foo));
+
 	d_string_free(foo);
 
 	return 0;
