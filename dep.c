@@ -2,7 +2,7 @@
 #include <string.h>
 #include <error.h>
 #include <errno.h>
-#include "deps.h"
+#include "dep.h"
 #include "str.h"
 
 static void dep_grow(dep_t *dp, unsigned int num);
