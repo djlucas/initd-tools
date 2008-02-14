@@ -13,5 +13,5 @@ config.log
 config.status
 configure
 libtool
-test
+tstr
 tdep
