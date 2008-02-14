@@ -52,3 +52,20 @@ void dep_list_add(dep_list_t *dlp, dep_t *dp)
 	}
 	dlp->last = dp;
 }
+
+dep_list_t *dep_list_copy(dep_list_t *old)
+{
+	dep_t *dold, *dnew;
+	dep_list_t *new = dep_list_new();
+
+	if (!old)
+		goto out;
+
+	for (dold = old->first; dold; dold = dold->next) {
+		dnew = dep_copy(dold);
+		dep_list_add(new, dnew);
+	}
+
+out:
+	return new;
+}

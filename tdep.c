@@ -7,7 +7,7 @@ static void print_list(dep_list_t *dl);
 int main(int argc, char *argv[])
 {
 	dep_t *a, *b;
-	dep_list_t *l;
+	dep_list_t *l, *m;
 
 	/* test single deps */
 	a = dep_new("test");
@@ -40,7 +40,13 @@ int main(int argc, char *argv[])
 	dep_list_add(l, b);
 
 	print_list(l);
+
+	m = dep_list_copy(l);
+	printf("Contents of copied dep list:\n");
+	print_list(m);
+
 	dep_list_free(l);
+	dep_list_free(m);
 
 	return 0;
 }
