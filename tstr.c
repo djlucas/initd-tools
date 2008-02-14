@@ -18,5 +18,8 @@ int main(int argc, char *argv[])
 
 	d_string_free(foo);
 
+	foo = d_string_new(NULL);
+	printf("String '%s' has '%d' characters\n", foo, strlen(foo));
+
 	return 0;
 }

@@ -13,7 +13,7 @@ char *d_string_new(const char *init)
 {
 	char *new;
 
-	new = strdup(init);
+	new = strdup(init ? init : "");
 	if (!new)
 		error(2, errno, "%s", __FUNCTION__);
 
