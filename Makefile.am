@@ -1,8 +1,8 @@
-noinst_LTLIBRARIES = libstr.la
-libstr_la_SOURCES = str.c
+noinst_LTLIBRARIES = libdep.la
+libdep_la_SOURCES = str.c dep.c dep-list.c
 
 noinst_PROGRAMS = test tdep
 test_SOURCES = test.c
-test_LDADD = libstr.la
-tdep_SOURCES = tdep.c dep.c
-tdep_LDADD = libstr.la
+test_LDADD = libdep.la
+tdep_SOURCES = tdep.c
+tdep_LDADD = libdep.la

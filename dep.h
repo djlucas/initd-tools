@@ -15,3 +15,6 @@ typedef struct dep_list {
 extern dep_t *dep_new(const char *name);
 extern void dep_free(dep_t *dep);
 extern void dep_add(dep_t *dp, const char *dep);
+extern dep_list_t *dep_list_new(void);
+extern void dep_list_free(dep_list_t *dlp);
+extern void dep_list_add(dep_list_t *dlp, dep_t *dp);
