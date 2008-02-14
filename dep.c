@@ -62,3 +62,28 @@ void dep_add(dep_t *dp, const char *dep)
 	dep_grow(dp, 1);
 	dp->deps[dp->ndeps++] = d_string_new(dep);
 }
+
+dep_t *dep_copy(dep_t *old)
+{
+	dep_t *new;
+	char *name;
+	int n;
+
+	if (!old) {
+		new = dep_new("");
+		goto out;
+	}
+
+	if (old->name)
+		name = old->name;
+	else
+		name = "";
+
+	new = dep_new(name);
+
+	for (n = 0; n < old->ndeps; n++)
+		dep_add(new, old->deps[n]);
+
+out:
+	return new;
+}

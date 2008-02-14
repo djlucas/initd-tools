@@ -17,7 +17,14 @@ int main(int argc, char *argv[])
 	dep_add(a, "second");
 
 	print_dep(a);
+
+	/* copy dep */
+	b = dep_copy(a);
+	printf("Contents of copied dep:\n");
+	print_dep(b);
+
 	dep_free(a);
+	dep_free(b);
 
 	/* test dep list */
 	a = dep_new("a");
