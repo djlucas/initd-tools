@@ -36,7 +36,7 @@ void dep_list_add(dep_list_t *dlp, dep_t *dp)
 
 	/* create a new list if necessary */
 	if (!dlp)
-		dp = dep_list_new();
+		dlp = dep_list_new();
 
 	/* just return if NULL was passed as dep */
 	if (!dp)
