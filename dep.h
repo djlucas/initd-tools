@@ -21,3 +21,4 @@ extern dep_list_t *dep_list_new(void);
 extern void dep_list_free(dep_list_t *dlp);
 extern void dep_list_add(dep_list_t *dlp, dep_t *dp);
 extern dep_list_t *dep_list_copy(dep_list_t *old);
+extern dep_t *dep_list_find_name(dep_list_t *dlp, const char *name);

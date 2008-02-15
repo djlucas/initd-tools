@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <error.h>
 #include <errno.h>
+#include <string.h>
 #include "dep.h"
 #include "str.h"
 
@@ -68,4 +69,19 @@ dep_list_t *dep_list_copy(dep_list_t *old)
 
 out:
 	return new;
+}
+
+dep_t *dep_list_find_name(dep_list_t *dlp, const char *name)
+{
+	dep_t *dp = NULL;
+
+	if (!(name || dlp))
+		goto out;
+
+	for (dp = dlp->first; dp; dp = dp->next) {
+		if (strcmp(dp->name, name) == 0)
+			break;
+	}
+out:
+	return dp;
 }

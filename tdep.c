@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "dep.h"
 
 static void print_dep(dep_t *dp);
@@ -6,7 +7,7 @@ static void print_list(dep_list_t *dl);
 
 int main(int argc, char *argv[])
 {
-	dep_t *a, *b;
+	dep_t *a, *b, *t;
 	dep_list_t *l, *m;
 
 	/* test single deps */
@@ -44,6 +45,13 @@ int main(int argc, char *argv[])
 	m = dep_list_copy(l);
 	printf("Contents of copied dep list:\n");
 	print_list(m);
+
+	/* See if we can find "b" in the list */
+	t = dep_list_find_name(m, "a");
+	if (t)
+		printf("Success: found \"%s\" in the list\n", t->name);
+	else
+		printf("Failure finding \"a\" in the list\n");
 
 	dep_list_free(l);
 	dep_list_free(m);
