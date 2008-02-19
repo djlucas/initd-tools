@@ -5,8 +5,6 @@
 #include "dep.h"
 #include "str.h"
 
-static void dep_list_grow(dep_list_t *dlp, unsigned int num);
-
 dep_list_t *dep_list_new(void)
 {
 	dep_list_t *new = malloc(sizeof(dep_list_t));
