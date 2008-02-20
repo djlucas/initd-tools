@@ -7,7 +7,7 @@ static void print_list(dep_list_t *dl);
 
 int main(int argc, char *argv[])
 {
-	dep_t *a, *b, *t;
+	dep_t *a, *b;
 	dep_list_t *l, *m;
 
 	/* test single deps */
@@ -23,6 +23,11 @@ int main(int argc, char *argv[])
 	b = dep_copy(a);
 	printf("Contents of copied dep:\n");
 	print_dep(b);
+
+	if (dep_exists_name(b, "first") == 0)
+		printf("Found dep \"first\" in b\n");
+	else
+		printf("Fail finding dep \"first\" in b\n");
 
 	dep_free(a);
 	dep_free(b);
@@ -47,9 +52,8 @@ int main(int argc, char *argv[])
 	print_list(m);
 
 	/* See if we can find "b" in the list */
-	t = dep_list_find_name(m, "a");
-	if (t)
-		printf("Success: found \"%s\" in the list\n", t->name);
+	if (dep_list_exists_name(m, "a") == 0)
+		printf("Success: found \"a\" in the list\n");
 	else
 		printf("Failure finding \"a\" in the list\n");
 

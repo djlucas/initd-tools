@@ -83,3 +83,14 @@ dep_t *dep_list_find_name(dep_list_t *dlp, const char *name)
 out:
 	return dp;
 }
+
+/* Verify that a given named dep exists in the list. Returns 0 for
+ * success and 1 for failure.
+ */
+int dep_list_exists_name(dep_list_t *dlp, const char *name)
+{
+	if (dep_list_find_name(dlp, name))
+		return 0;
+	else
+		return 1;
+}

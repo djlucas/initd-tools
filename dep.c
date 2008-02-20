@@ -78,3 +78,23 @@ dep_t *dep_copy(dep_t *old)
 out:
 	return new;
 }
+
+/* Verify that a given named dep exists in the dep_t. Returns 0 for
+ * success and 1 for failure.
+ */
+int dep_exists_name(dep_t *dp, const char *name)
+{
+	int n, ret = 1;
+
+	if (!dp)
+		goto out;
+
+	for (n = 0; n < dp->ndeps; n++) {
+		if (strcmp(name, dp->deps[n]) == 0) {
+			ret = 0;
+			break;
+		}
+	}
+out:
+	return ret;
+}
