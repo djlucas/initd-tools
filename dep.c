@@ -33,9 +33,10 @@ void dep_free(dep_t *dep)
 
 	/* free the members of the deps array */
 	for (n = 0; n < dep->ndeps; n++)
-		free(dep->deps[n]);
+		d_string_free(dep->deps[n]);
+	dep->deps = NULL;
 
-	free(dep->name);
+	d_string_free(dep->name);
 
 	free(dep);
 	dep = NULL;
