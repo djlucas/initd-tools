@@ -6,7 +6,8 @@ static void print_strarg(strarg_t *sa);
 
 int main(int argc, char *argv[])
 {
-	strarg_t *foo = strarg_new();
+	strarg_t *foo, *bar;
+	foo = strarg_new();
 
 	strarg_add(foo, "this");
 	strarg_add(foo, "is");
@@ -15,7 +16,13 @@ int main(int argc, char *argv[])
 
 	print_strarg(foo);
 
+	bar = strarg_copy(foo);
+	strarg_add(bar, "again");
+
+	print_strarg(bar);
+
 	strarg_free(foo);
+	strarg_free(bar);
 
 	return 0;
 }

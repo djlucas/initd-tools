@@ -48,3 +48,18 @@ void strarg_add(strarg_t *sa, const char *name)
 	sa->str[sa->nstr++] = d_string_new(name);
 	sa->str[sa->nstr] = NULL;
 }
+
+strarg_t *strarg_copy(strarg_t *source)
+{
+	int n;
+	strarg_t *tgt = strarg_new();
+
+	if (!source)
+		goto out;
+
+	for (n = 0; n < source->nstr; n++)
+		strarg_add(tgt, source->str[n]);
+
+out:
+	return tgt;
+}

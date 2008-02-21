@@ -10,3 +10,4 @@ extern void d_string_append(char *ds, const char *extra);
 extern strarg_t *strarg_new(void);
 extern void strarg_free(strarg_t *sa);
 extern void strarg_add(strarg_t *sa, const char *name);
+extern strarg_t *strarg_copy(strarg_t *source);
