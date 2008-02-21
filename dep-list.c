@@ -94,3 +94,29 @@ int dep_list_exists_name(dep_list_t *dlp, const char *name)
 	else
 		return 1;
 }
+
+/* Ensure that the sub-dependencies for each dep_t in the list exist in
+ * the list as their own dep_t. Returns NULL if all the sub-deps have
+ * been found or the name of the first missing dep if not.
+ */
+char *dep_list_verify_all(dep_list_t *dlp)
+{
+	int n;
+	char *missing = NULL;
+	dep_t *dp;
+
+	if (!dlp)
+		goto out;
+
+	for (dp = dlp->first; dp; dp = dp->next) {
+		for (n = 0; n < dp->ndeps; n++) {
+			if (dep_list_exists_name(dlp, dp->deps[n]) != 0) {
+				missing = d_string_new(dp->deps[n]);
+				break;
+			}
+		}
+	}
+
+out:
+	return missing;
+}
