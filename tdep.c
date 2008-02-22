@@ -71,9 +71,9 @@ static void print_dep(dep_t *dp)
 		return;
 	}
 	printf("Dep \"%s\" has %d dependencies:\n", dp->name,
-		dp->ndeps);
-	for (n = 0; n < dp->ndeps; n++)
-		printf(" %d: %s\n", n, dp->deps[n]);
+		dp->deps->nstr);
+	for (n = 0; n < dp->deps->nstr; n++)
+		printf(" %d: %s\n", n, dp->deps->str[n]);
 }
 
 static void print_list(dep_list_t *dl)

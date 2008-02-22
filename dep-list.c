@@ -55,18 +55,18 @@ void dep_list_add(dep_list_t *dlp, dep_t *dp)
 dep_list_t *dep_list_copy(dep_list_t *old)
 {
 	dep_t *dold, *dnew;
-	dep_list_t *new = dep_list_new();
+	dep_list_t *dest = dep_list_new();
 
 	if (!old)
 		goto out;
 
 	for (dold = old->first; dold; dold = dold->next) {
 		dnew = dep_copy(dold);
-		dep_list_add(new, dnew);
+		dep_list_add(dest, dnew);
 	}
 
 out:
-	return new;
+	return dest;
 }
 
 dep_t *dep_list_find_name(dep_list_t *dlp, const char *name)
@@ -109,9 +109,9 @@ char *dep_list_verify_all(dep_list_t *dlp)
 		goto out;
 
 	for (dp = dlp->first; dp; dp = dp->next) {
-		for (n = 0; n < dp->ndeps; n++) {
-			if (dep_list_exists_name(dlp, dp->deps[n]) != 0) {
-				missing = d_string_new(dp->deps[n]);
+		for (n = 0; n < dp->deps->nstr; n++) {
+			if (dep_list_exists_name(dlp, dp->deps->str[n]) != 0) {
+				missing = d_string_new(dp->deps->str[n]);
 				break;
 			}
 		}

@@ -1,3 +1,6 @@
+#ifndef _str_h_
+#define _str_h_
+
 typedef struct strarg {
 	unsigned int nstr;
 	char **str;
@@ -11,3 +14,5 @@ extern strarg_t *strarg_new(void);
 extern void strarg_free(strarg_t *sa);
 extern void strarg_add(strarg_t *sa, const char *name);
 extern strarg_t *strarg_copy(strarg_t *source);
+
+#endif /* _str_h_ */

@@ -12,12 +12,7 @@ dep_t *dep_new(const char *name) {
 
 	new->name = d_string_new(name);
 
-	new->ndeps = 0;
-
-	new->deps = malloc(sizeof(char *));
-	if (!new->deps)
-		error(2, errno, "%s", __FUNCTION__);
-	*new->deps = NULL;
+	new->deps = strarg_new();
 
 	new->prev = NULL;
 	new->next = NULL;
@@ -27,12 +22,8 @@ dep_t *dep_new(const char *name) {
 
 void dep_free(dep_t *dep)
 {
-	int n;
-
 	/* free the members of the deps array */
-	for (n = 0; n < dep->ndeps; n++)
-		d_string_free(dep->deps[n]);
-	dep->deps = NULL;
+	strarg_free(dep->deps);
 
 	d_string_free(dep->name);
 
@@ -46,37 +37,32 @@ void dep_add(dep_t *dp, const char *dep)
 	if (!dp)
 		dp = dep_new("");
 
-	dp->deps = realloc(dp->deps, (dp->ndeps + 2) * sizeof(char *));
-	if (!dp->deps)
-		error(2, errno, "%s", __FUNCTION__);
-
-	dp->deps[dp->ndeps++] = d_string_new(dep);
-	dp->deps[dp->ndeps] = NULL;
+	strarg_add(dp->deps, dep);
 }
 
-dep_t *dep_copy(dep_t *old)
+dep_t *dep_copy(dep_t *source)
 {
-	dep_t *new;
+	dep_t *dest;
 	char *name;
 	int n;
 
-	if (!old) {
-		new = dep_new("");
+	if (!source) {
+		dest = dep_new("");
 		goto out;
 	}
 
-	if (old->name)
-		name = old->name;
+	if (source->name)
+		name = source->name;
 	else
 		name = "";
 
-	new = dep_new(name);
+	dest = dep_new(name);
 
-	for (n = 0; n < old->ndeps; n++)
-		dep_add(new, old->deps[n]);
+	for (n = 0; n < source->deps->nstr; n++)
+		dep_add(dest, source->deps->str[n]);
 
 out:
-	return new;
+	return dest;
 }
 
 /* Verify that a given named dep exists in the dep_t. Returns 0 for
@@ -89,8 +75,8 @@ int dep_exists_name(dep_t *dp, const char *name)
 	if (!dp)
 		goto out;
 
-	for (n = 0; n < dp->ndeps; n++) {
-		if (strcmp(name, dp->deps[n]) == 0) {
+	for (n = 0; n < dp->deps->nstr; n++) {
+		if (strcmp(name, dp->deps->str[n]) == 0) {
 			ret = 0;
 			break;
 		}
