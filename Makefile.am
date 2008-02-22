@@ -1,12 +1,12 @@
-noinst_LTLIBRARIES = libdep.la
-libdep_la_SOURCES = str.c strarg.c dep.c dep-list.c
+noinst_LTLIBRARIES = libinitd.la
+libinitd_la_SOURCES = str.c dep.c initd.c initd-list.c
 
-noinst_PROGRAMS = tstr tstr2 tdep tdep2
+noinst_PROGRAMS = tstr tdep tinitd tinitd-list
 tstr_SOURCES = tstr.c
-tstr_LDADD = libdep.la
-tstr2_SOURCES = tstr2.c
-tstr2_LDADD = libdep.la
+tstr_LDADD = libinitd.la
 tdep_SOURCES = tdep.c
-tdep_LDADD = libdep.la
-tdep2_SOURCES = tdep2.c
-tdep2_LDADD = libdep.la
+tdep_LDADD = libinitd.la
+tinitd_SOURCES = tinitd.c
+tinitd_LDADD = libinitd.la
+tinitd_list_SOURCES = tinitd-list.c
+tinitd_list_LDADD = libinitd.la
