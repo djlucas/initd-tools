@@ -11,5 +11,9 @@ if test "x$GCC" = xyes; then
 	CFLAGS="$CFLAGS -Wall"
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([
+Makefile
+lib/Makefile
+test/Makefile
+])
 AC_OUTPUT
