@@ -7,6 +7,6 @@ extern void d_string_append(char *ds, const char *extra);
 
 extern char **strarg_new(unsigned int *num);
 extern void strarg_free(char **strarg, unsigned int num);
-extern void strarg_add(char **strarg, unsigned int *num, const char *s);
+extern char **strarg_add(char **strarg, unsigned int *num, const char *s);
 
 #endif /* _str_h_ */

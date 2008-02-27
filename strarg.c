@@ -30,10 +30,8 @@ out:
 	strarg = NULL;
 }
 
-void strarg_add(char **strarg, unsigned int *num, const char *s)
+char **strarg_add(char **strarg, unsigned int *num, const char *s)
 {
-	int n;
-
 	if (!strarg)
 		strarg = strarg_new(num);
 
@@ -43,4 +41,6 @@ void strarg_add(char **strarg, unsigned int *num, const char *s)
 
 	strarg[(*num)++] = d_string_new(s);
 	strarg[*num] = NULL;
+
+	return strarg;
 }

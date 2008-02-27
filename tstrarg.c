@@ -10,8 +10,10 @@ int main(int argc, char *argv[])
 
 	test = strarg_new(&num);
 
-	strarg_add(test, &num, "hello");
-	strarg_add(test, &num, "world");
+	test = strarg_add(test, &num, "hello");
+	test = strarg_add(test, &num, "world");
+	test = strarg_add(test, &num, "it's");
+	test = strarg_add(test, &num, "me");
 
 	printf("Contents of test strarg\n");
 	for (n = 0; n < num; n++)
