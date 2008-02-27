@@ -7,6 +7,7 @@ static void print_dep(dep_t *sa);
 int main(int argc, char *argv[])
 {
 	dep_t *foo, *bar;
+	printf("Creating new dep foo\n");
 	foo = dep_new();
 
 	dep_add(foo, "this");
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
 	dep_add(foo, "a");
 	dep_add(foo, "test");
 
+	printf("Contents of foo dep:\n");
 	print_dep(foo);
 
 	bar = dep_copy(foo);

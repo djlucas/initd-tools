@@ -12,25 +12,17 @@ dep_t *dep_new(void)
 	if (!dp)
 		error(2, errno, "%s", __FUNCTION__);
 
-	dp->ndep = 0;
-
-	dp->dep = malloc(sizeof(char *));
-	if (!dp->dep)
-		error(2, errno, "%s", __FUNCTION__);
-	*dp->dep = NULL;
+	dp->dep = strarg_new(&dp->ndep);
 
 	return dp;
 }
 
 void dep_free(dep_t *dp)
 {
-	int n;
-
 	if (!dp)
 		return;
 
-	for (n = 0; n < dp->ndep; n++)
-		d_string_free(dp->dep[n]);
+	strarg_free(dp->dep, dp->ndep);
 
 	free(dp);
 	dp = NULL;
@@ -41,12 +33,7 @@ void dep_add(dep_t *dp, const char *name)
 	if (!dp)
 		dp = dep_new();
 
-	dp->dep = realloc(dp->dep, (dp->ndep + 2) * sizeof(char *));
-	if (!dp->dep)
-		error(2, errno, "%s", __FUNCTION__);
-
-	dp->dep[dp->ndep++] = d_string_new(name);
-	dp->dep[dp->ndep] = NULL;
+	dp->dep = strarg_add(dp->dep, &dp->ndep, name);
 }
 
 dep_t *dep_copy(dep_t *source)
