@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include "str.h"
 
-static void d_string_grow(char *ds, size_t len);
+static char *d_string_grow(char *ds, size_t len);
 
 char *d_string_new(const char *init)
 {
@@ -25,19 +25,19 @@ void d_string_free(char *str) {
 	str = NULL;
 }
 
-static void d_string_grow(char *ds, size_t len) {
-	char *newbuf;
-
+static char *d_string_grow(char *ds, size_t len) {
 	if (len == 0)
-		return;
+		goto out;
 
-	if ((newbuf = realloc(ds, strlen(ds) + len + 1)))
-		ds = newbuf;
-	else
+	ds = realloc(ds, strlen(ds) + len + 1);
+	if (!ds)
 		error(2, errno, "%s", __FUNCTION__);
+
+out:
+	return ds;
 }
 
-void d_string_append(char *ds, const char *extra) {
+char *d_string_append(char *ds, const char *extra) {
 	size_t extlen = strlen(extra);
 
 	if (!ds) {
@@ -48,8 +48,9 @@ void d_string_append(char *ds, const char *extra) {
 	if (extlen == 0)
 		goto out;
 
-	d_string_grow(ds, extlen);
+	ds = d_string_grow(ds, extlen);
 	ds = strncat(ds, extra, extlen);
 
-out:;
+out:
+	return ds;
 }
