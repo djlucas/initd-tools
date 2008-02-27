@@ -1,6 +1,8 @@
 INCLUDES = -I$(top_srcdir)/lib
 
-noinst_PROGRAMS = tstr tstrarg tdep tinitd tinitd-list
+TESTS = tstr tstrarg tdep tinitd tinitd-list
+check_PROGRAMS = $(TESTS)
+
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
 tstrarg_SOURCES = tstrarg.c
