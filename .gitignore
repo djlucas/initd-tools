@@ -13,8 +13,3 @@ config.log
 config.status
 configure
 libtool
-tstr
-tstrarg
-tdep
-tinitd
-tinitd-list
