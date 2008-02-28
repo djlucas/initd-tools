@@ -3,6 +3,14 @@
 
 #include "dep.h"
 
+#ifndef DEF_INITD_DIR
+#define DEF_INITD_DIR "/etc/init.d"
+#endif
+
+#ifndef INITD_LINE_MAX
+#define INITD_LINE_MAX 256
+#endif
+
 typedef struct initd {
 	char *name;
 	dep_t *deps;
@@ -21,6 +29,7 @@ extern void initd_free(initd_t *ip);
 extern void initd_add(initd_t *ip, const char *name);
 extern initd_t *initd_copy(initd_t *source);
 extern int initd_exists_name(initd_t *ip, const char *name);
+extern int initd_parse(initd_t *ip);
 
 extern initd_list_t *initd_list_new(void);
 extern void initd_list_free(initd_list_t *ilp);
