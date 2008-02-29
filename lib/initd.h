@@ -11,6 +11,22 @@
 #define INITD_LINE_MAX 256
 #endif
 
+typedef enum initd_key {
+	KEY_ERR = -1,  /* Invalid key or failure reading key */
+	KEY_NONE,      /* Empty field */
+	KEY_NAME,      /* Filename of the script */
+	KEY_PROV,      /* Provides */
+	KEY_DSTART,    /* Default-Start */
+	KEY_DSTOP,     /* Default-Stop */
+	KEY_RSTART,    /* Required-Start */
+	KEY_RSTOP,     /* Required-Stop */
+	KEY_SSTART,    /* Should-Start */
+	KEY_SSTOP,     /* Should-Stop */
+	KEY_SDESC,     /* Short-Description */
+	KEY_DESC,      /* Description */
+	KEY_EXT        /* X- extension */
+} initd_key_t;
+
 typedef struct initd {
 	char *name;
 	dep_t *deps;
