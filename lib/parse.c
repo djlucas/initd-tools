@@ -133,10 +133,11 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 			pos++;
 			value = d_string_new(pos);
 			key = KEY_DESC;
+			goto print;
 		} else {
 			key = KEY_ERR;
+			goto out;
 		}
-		goto out;
 	}
 
 	/* Otherwise, the next character must be a space or this line
@@ -153,7 +154,7 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 		pos++;
 		value = d_string_new(pos);
 		key = KEY_DESC;
-		goto out;
+		goto print;
 	}
 
 	/* The special case of the description field has now been
@@ -203,9 +204,9 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 	/* store to the end */
 	value = d_string_new(pos);
 
+print:
 	printf("key type = %d, key = '%s', value = '%s'\n", key,
 		kstring, value);
-
 out:
 	return key;
 }
