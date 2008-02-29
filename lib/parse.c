@@ -184,7 +184,7 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 		error(2, errno, "%s", __FUNCTION__);
 
 	/* Strip any trailing spaces from the key string */
-	for (n = pos - tmp -1; n >= 0; n--) {
+	for (n = strlen(kstring) - 1; n >= 0; n--) {
 		if (isspace(kstring[n]))
 			kstring[n] = '\0';
 		else
@@ -203,6 +203,14 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 
 	/* store to the end */
 	value = d_string_new(pos);
+
+	/* Strip any trailing spaces from the value string */
+	for (n = strlen(value) - 1; n >= 0; n--) {
+		if (isspace(value[n]))
+			value[n] = '\0';
+		else
+			break;
+	}
 
 print:
 	printf("key type = %d, key = '%s', value = '%s'\n", key,
