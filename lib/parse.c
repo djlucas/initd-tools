@@ -109,7 +109,8 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 					initd_key_t prev)
 {
 	initd_key_t key = KEY_NONE;
-	char *pos, *tmp, *kstring, *value;
+	char *pos, *tmp;
+	char *kstring = NULL, *value = NULL;
 	int n;
 
 	if (!line)
@@ -213,6 +214,10 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 	}
 
 print:
+	if (!kstring)
+		kstring = "Description";
+	if (!value)
+		value = "";
 	printf("key type = %d, key = '%s', value = '%s'\n", key,
 		kstring, value);
 out:
