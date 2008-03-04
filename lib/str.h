@@ -13,5 +13,6 @@ typedef struct strarg {
 extern char **strarg_new(unsigned int *num);
 extern void strarg_free(char **strarg, unsigned int num);
 extern char **strarg_add(char **strarg, unsigned int *num, const char *s);
+extern int strarg_exists(char **strarg, unsigned int num, const char *s);
 
 #endif /* _str_h_ */

@@ -44,3 +44,23 @@ char **strarg_add(char **strarg, unsigned int *num, const char *s)
 
 	return strarg;
 }
+
+/* Find if a given string exists in the strarg array. Returns 1 for true
+ * and 0 for false. */
+int strarg_exists(char **strarg, unsigned int num, const char *s)
+{
+	int n, found = 0;
+
+	if(!strarg)
+		goto out;
+
+	for (n = 0; n < num; n++) {
+		if (strcmp(s, strarg[n]) == 0) {
+			found = 1;
+			break;
+		}
+	}
+
+out:
+	return found;
+}
