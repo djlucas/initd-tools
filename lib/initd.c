@@ -14,6 +14,15 @@ initd_t *initd_new(const char *name) {
 
 	ip->deps = dep_new();
 
+	ip->dstart = ip->dstop = 0;
+
+	ip->rstart = dep_new();
+	ip->rstop = dep_new();
+	ip->sstart = dep_new();
+	ip->sstop = dep_new();
+
+	ip->sdesc = ip->desc = NULL;
+
 	ip->prev = NULL;
 	ip->next = NULL;
 
@@ -24,6 +33,14 @@ void initd_free(initd_t *ip)
 {
 	/* free the members of the deps array */
 	dep_free(ip->deps);
+
+	dep_free(ip->rstart);
+	dep_free(ip->rstop);
+	dep_free(ip->sstart);
+	dep_free(ip->sstop);
+
+	d_string_free(ip->sdesc);
+	d_string_free(ip->desc);
 
 	d_string_free(ip->name);
 

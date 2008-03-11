@@ -27,9 +27,33 @@ typedef enum initd_key {
 	KEY_EXT        /* X- extension */
 } initd_key_t;
 
+typedef enum initd_rc {
+	RC_SI = (1 << 0),  /* rcsysinit.d */
+	RC_0  = (1 << 1),  /* rc1.d */
+	RC_2  = (1 << 2),  /* rc2.d */
+	RC_3  = (1 << 3),  /* rc3.d */
+	RC_4  = (1 << 4),  /* rc4.d */
+	RC_5  = (1 << 5),  /* rc5.d */
+	RC_6  = (1 << 6)   /* rc6.d */
+} initd_rc_t;
+
 typedef struct initd {
 	char *name;
 	dep_t *deps;
+
+	strarg_t *prov;     /* Provides */
+
+	initd_rc_t dstart;  /* Default-Start */
+	initd_rc_t dstop;   /* Default-Stop */
+
+	dep_t *rstart;      /* Required-Start */
+	dep_t *rstop;       /* Required-Stop */
+
+	dep_t *sstart;      /* Should-Start */
+	dep_t *sstop;       /* Should-Stop */
+
+	char *sdesc;        /* Short-Description */
+	char *desc;         /* Description */
 
 	struct initd *prev;
 	struct initd *next;
