@@ -15,6 +15,9 @@ int main(int argc, char *argv[])
 	initd_add(a, "first");
 	initd_add(a, "second");
 
+	initd_add_prov(a, "service1");
+	initd_add_prov(a, "service2");
+
 	print_initd(a);
 
 	/* copy initd */
@@ -44,4 +47,9 @@ static void print_initd(initd_t *ip)
 		ip->deps->ndep);
 	for (n = 0; n < ip->deps->ndep; n++)
 		printf(" %d: %s\n", n, ip->deps->dep[n]);
+
+	printf("initd \"%s\" provides %d services:\n", ip->name,
+		ip->prov->nprov);
+	for (n = 0; n < ip->prov->nprov; n++)
+		printf(" %d: %s\n", n, ip->prov->prov[n]);
 }

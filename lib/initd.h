@@ -72,6 +72,9 @@ extern initd_t *initd_copy(initd_t *source);
 extern int initd_exists_name(initd_t *ip, const char *name);
 extern int initd_parse(initd_t *ip);
 
+/* Setters */
+#define initd_add_prov(ip, name) prov_add(ip->prov, name)
+
 extern initd_list_t *initd_list_new(void);
 extern void initd_list_free(initd_list_t *ilp);
 extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
