@@ -65,7 +65,6 @@ initd_t *initd_copy(initd_t *source)
 {
 	initd_t *dest;
 	char *name;
-	int n;
 
 	if (!source) {
 		dest = initd_new("");
@@ -79,8 +78,20 @@ initd_t *initd_copy(initd_t *source)
 
 	dest = initd_new(name);
 
-	for (n = 0; n < source->deps->ndep; n++)
-		initd_add(dest, source->deps->dep[n]);
+	dest->deps = dep_copy(source->deps);
+
+	dest->prov = prov_copy(source->prov);
+
+	dest->dstart = source->dstart;
+	dest->dstop = source->dstop;
+
+	dest->rstart = dep_copy(source->rstart);
+	dest->rstop = dep_copy(source->rstop);
+	dest->sstart = dep_copy(source->sstart);
+	dest->sstop = dep_copy(source->sstop);
+
+	dest->sdesc = d_string_new(source->sdesc);
+	dest->desc = d_string_new(source->desc);
 
 out:
 	return dest;
