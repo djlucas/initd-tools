@@ -2,6 +2,7 @@
 #define _initd_h_
 
 #include "dep.h"
+#include "prov.h"
 
 #ifndef DEF_INITD_DIR
 #define DEF_INITD_DIR "/etc/init.d"
@@ -41,7 +42,7 @@ typedef struct initd {
 	char *name;
 	dep_t *deps;
 
-	strarg_t *prov;     /* Provides */
+	prov_t *prov;       /* Provides */
 
 	initd_rc_t dstart;  /* Default-Start */
 	initd_rc_t dstop;   /* Default-Stop */

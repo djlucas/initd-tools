@@ -14,6 +14,8 @@ initd_t *initd_new(const char *name) {
 
 	ip->deps = dep_new();
 
+	ip->prov = prov_new();
+
 	ip->dstart = ip->dstop = 0;
 
 	ip->rstart = dep_new();
@@ -41,6 +43,8 @@ void initd_free(initd_t *ip)
 
 	d_string_free(ip->sdesc);
 	d_string_free(ip->desc);
+
+	prov_free(ip->prov);
 
 	d_string_free(ip->name);
 
