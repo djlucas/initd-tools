@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <error.h>
 #include <errno.h>
+#include <string.h>
 #include "str.h"
 
 char **strarg_new(unsigned int *num)
