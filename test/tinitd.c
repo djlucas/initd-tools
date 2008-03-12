@@ -23,6 +23,10 @@ int main(int argc, char *argv[])
 	initd_add_sstart(a, "dbus");
 	initd_add_sstop(a, "dbus");
 
+	initd_set_sdesc(a, "A test service");
+	initd_set_desc(a, "This is a dummy test service");
+	initd_add_desc(a, "just for testing our functions");
+
 	print_initd(a);
 
 	/* copy initd */
@@ -48,6 +52,10 @@ static void print_initd(initd_t *ip)
 		printf("No initd provided");
 		return;
 	}
+
+	printf("initd \"%s\": %s\n", ip->name, ip->sdesc);
+	printf("Description: %s\n", ip->desc);
+
 	printf("initd \"%s\" has %d dependencies:\n", ip->name,
 		ip->deps->ndep);
 	for (n = 0; n < ip->deps->ndep; n++)

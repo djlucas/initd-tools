@@ -116,3 +116,38 @@ int initd_exists_name(initd_t *ip, const char *name)
 out:
 	return ret;
 }
+
+void initd_set_sdesc(initd_t *ip, const char *sdesc)
+{
+	if (!ip)
+		return;
+
+	if (ip->sdesc)
+		d_string_free(ip->sdesc);
+
+	ip->sdesc = d_string_new(sdesc);
+}
+
+void initd_set_desc(initd_t *ip, const char *desc)
+{
+	if (!ip)
+		return;
+
+	if (ip->desc)
+		d_string_free(ip->desc);
+
+	ip->desc = d_string_new(desc);
+}
+
+void initd_add_desc(initd_t *ip, const char *ext)
+{
+	if (!ip || !ext)
+		return;
+
+	if (ip->desc) {
+		ip->desc = d_string_append(ip->desc, " ");
+		ip->desc = d_string_append(ip->desc, ext);
+	} else {
+		ip->desc = d_string_new(ext);
+	}
+}
