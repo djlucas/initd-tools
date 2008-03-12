@@ -18,6 +18,11 @@ int main(int argc, char *argv[])
 	initd_add_prov(a, "service1");
 	initd_add_prov(a, "service2");
 
+	initd_add_rstart(a, "$network");
+	initd_add_rstop(a, "$network");
+	initd_add_sstart(a, "dbus");
+	initd_add_sstop(a, "dbus");
+
 	print_initd(a);
 
 	/* copy initd */
@@ -52,4 +57,24 @@ static void print_initd(initd_t *ip)
 		ip->prov->nprov);
 	for (n = 0; n < ip->prov->nprov; n++)
 		printf(" %d: %s\n", n, ip->prov->prov[n]);
+
+	printf("initd \"%s\" must start after %d services:\n", ip->name,
+		ip->rstart->ndep);
+	for (n = 0; n < ip->rstart->ndep; n++)
+		printf(" %d: %s\n", n, ip->rstart->dep[n]);
+
+	printf("initd \"%s\" must stop before %d services:\n", ip->name,
+		ip->rstop->ndep);
+	for (n = 0; n < ip->rstop->ndep; n++)
+		printf(" %d: %s\n", n, ip->rstop->dep[n]);
+
+	printf("initd \"%s\" should start after %d services:\n", ip->name,
+		ip->sstart->ndep);
+	for (n = 0; n < ip->sstart->ndep; n++)
+		printf(" %d: %s\n", n, ip->sstart->dep[n]);
+
+	printf("initd \"%s\" should stop before %d services:\n", ip->name,
+		ip->sstop->ndep);
+	for (n = 0; n < ip->sstop->ndep; n++)
+		printf(" %d: %s\n", n, ip->sstop->dep[n]);
 }

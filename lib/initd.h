@@ -74,6 +74,10 @@ extern int initd_parse(initd_t *ip);
 
 /* Setters */
 #define initd_add_prov(ip, name) prov_add(ip->prov, name)
+#define initd_add_rstart(ip, name) dep_add(ip->rstart, name)
+#define initd_add_rstop(ip, name) dep_add(ip->rstop, name)
+#define initd_add_sstart(ip, name) dep_add(ip->sstart, name)
+#define initd_add_sstop(ip, name) dep_add(ip->sstop, name)
 
 extern initd_list_t *initd_list_new(void);
 extern void initd_list_free(initd_list_t *ilp);
