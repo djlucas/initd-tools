@@ -9,7 +9,9 @@ Makefile.in
 Makefile
 aclocal.m4
 config.cache
+config.h*
 config.log
 config.status
 configure
 libtool
+stamp-h*

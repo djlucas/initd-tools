@@ -7,6 +7,8 @@ AC_DEFUN([AC_LIBTOOL_LANG_F77_CONFIG], [:])
 AC_DEFUN([AC_LIBTOOL_LANG_GCJ_CONFIG], [:])
 AC_PROG_LIBTOOL
 
+AC_CONFIG_HEADERS([config.h])
+
 if test "x$GCC" = xyes; then
 	CFLAGS="$CFLAGS -Wall"
 fi
