@@ -16,4 +16,5 @@ Makefile
 lib/Makefile
 test/Makefile
 ])
+
 AC_OUTPUT

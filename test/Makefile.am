@@ -1,8 +1,8 @@
 INCLUDES = -I$(top_srcdir)/lib
 
 EXTRA_DIST = test-script
-TESTS = tstr tstrarg tdep tparse tinitd tinitd-list
-check_PROGRAMS = $(TESTS)
+TESTS = tstr tstrarg tdep $(srcdir)/tparse.sh tinitd tinitd-list
+check_PROGRAMS = tstr tstrarg tdep tparse tinitd tinitd-list
 
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
