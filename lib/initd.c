@@ -15,8 +15,6 @@ initd_t *initd_new(const char *name) {
 
 	ip->name = d_string_new(name);
 
-	ip->deps = dep_new();
-
 	ip->prov = prov_new();
 
 	ip->dstart = ip->dstop = 0;
@@ -36,9 +34,7 @@ initd_t *initd_new(const char *name) {
 
 void initd_free(initd_t *ip)
 {
-	/* free the members of the deps array */
-	dep_free(ip->deps);
-
+	/* free the dependencies */
 	dep_free(ip->rstart);
 	dep_free(ip->rstop);
 	dep_free(ip->sstart);
@@ -53,15 +49,6 @@ void initd_free(initd_t *ip)
 
 	free(ip);
 	ip = NULL;
-}
-
-void initd_add(initd_t *ip, const char *name)
-{
-	/* create a new unnamed initd_t if necessary */
-	if (!ip)
-		ip = initd_new("");
-
-	dep_add(ip->deps, name);
 }
 
 initd_t *initd_copy(initd_t *source)
@@ -81,8 +68,6 @@ initd_t *initd_copy(initd_t *source)
 
 	dest = initd_new(name);
 
-	dest->deps = dep_copy(source->deps);
-
 	dest->prov = prov_copy(source->prov);
 
 	dest->dstart = source->dstart;
@@ -98,26 +83,6 @@ initd_t *initd_copy(initd_t *source)
 
 out:
 	return dest;
-}
-
-/* Verify that a given named dep exists in the initd. Returns 0 for
- * success and 1 for failure.
- */
-int initd_exists_name(initd_t *ip, const char *name)
-{
-	int n, ret = 1;
-
-	if (!ip)
-		goto out;
-
-	for (n = 0; n < ip->deps->ndep; n++) {
-		if (strcmp(name, ip->deps->dep[n]) == 0) {
-			ret = 0;
-			break;
-		}
-	}
-out:
-	return ret;
 }
 
 void initd_set_sdesc(initd_t *ip, const char *sdesc)

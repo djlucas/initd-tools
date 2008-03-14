@@ -41,7 +41,6 @@ typedef enum initd_rc {
 
 typedef struct initd {
 	char *name;
-	dep_t *deps;
 
 	prov_t *prov;       /* Provides */
 
@@ -68,9 +67,7 @@ typedef struct initd_list {
 
 extern initd_t *initd_new(const char *name);
 extern void initd_free(initd_t *ip);
-extern void initd_add(initd_t *ip, const char *name);
 extern initd_t *initd_copy(initd_t *source);
-extern int initd_exists_name(initd_t *ip, const char *name);
 extern int initd_parse(initd_t *ip);
 
 /* Setters */

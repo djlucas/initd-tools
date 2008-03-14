@@ -15,9 +15,6 @@ int main(int argc, char *argv[])
 	a = initd_new("test");
 	printf("Created initd with name '%s'\n", a->name);
 
-	initd_add(a, "first");
-	initd_add(a, "second");
-
 	initd_add_prov(a, "service1");
 	initd_add_prov(a, "service2");
 
@@ -37,10 +34,10 @@ int main(int argc, char *argv[])
 	printf("Contents of copied initd:\n");
 	print_initd(b);
 
-	if (initd_exists_name(b, "first") == 0)
-		printf("Found dep \"first\" in b\n");
+	if (initd_provides(b, "service1"))
+		printf("Found service \"service1\" in b\n");
 	else
-		printf("Fail finding dep \"first\" in b\n");
+		printf("Fail finding service \"service1\" in b\n");
 
 	initd_free(a);
 	initd_free(b);
@@ -58,11 +55,6 @@ static void print_initd(initd_t *ip)
 
 	printf("initd \"%s\": %s\n", ip->name, ip->sdesc);
 	printf("Description: %s\n", ip->desc);
-
-	printf("initd \"%s\" has %d dependencies:\n", ip->name,
-		ip->deps->ndep);
-	for (n = 0; n < ip->deps->ndep; n++)
-		printf(" %d: %s\n", n, ip->deps->dep[n]);
 
 	printf("initd \"%s\" provides %d services:\n", ip->name,
 		ip->prov->nprov);
