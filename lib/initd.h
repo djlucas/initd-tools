@@ -1,6 +1,7 @@
 #ifndef _initd_h_
 #define _initd_h_
 
+#include <stdbool.h>
 #include "dep.h"
 #include "prov.h"
 
@@ -88,6 +89,12 @@ extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
 extern initd_list_t *initd_list_copy(initd_list_t *source);
 extern initd_t *initd_list_find_name(initd_list_t *ilp, const char *name);
 extern int initd_list_exists_name(initd_list_t *ilp, const char *name);
+
+/* Verification */
+extern bool initd_provides(initd_t *ip, const char *serv);
+extern bool initd_list_provides(initd_list_t *ilp, const char *serv);
+extern char *initd_verify_deps(initd_list_t *ilp, initd_t *ip,
+				initd_key_t key);
 extern char *initd_list_verify_all(initd_list_t *ilp);
 
 #endif /* _initd_h_ */

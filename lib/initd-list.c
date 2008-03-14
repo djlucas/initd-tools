@@ -5,6 +5,7 @@
 #include <error.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 #include "initd.h"
 #include "str.h"
 
@@ -100,27 +101,108 @@ int initd_list_exists_name(initd_list_t *ilp, const char *name)
 		return 1;
 }
 
+/* Find whether a given service is provided by an initd. */
+bool initd_provides(initd_t *ip, const char *serv)
+{
+	bool found = false;
+	int n;
+
+	if (!ip || !ip->prov)
+		goto out;
+
+	for (n = 0; n < ip->prov->nprov; n++) {
+		if (strcmp(serv, ip->prov->prov[n]) == 0) {
+			found = true;
+			break;
+		}
+	}
+
+out:
+	return found;
+}
+
+/* Find whether a given service is provided by any script in the list. */
+bool initd_list_provides(initd_list_t *ilp, const char *serv)
+{
+	bool found = false;
+	initd_t *cur;
+
+	if (!ilp)
+		goto out;
+
+	for (cur = ilp->first; cur; cur = cur->next) {
+		if (initd_provides(cur, serv)) {
+			found = true;
+			break;
+		}
+	}
+
+out:
+	return found;
+}
+
+/* Given an initd, verify that all the Required-Start scripts exist in
+ * the supplied list. */
+char *initd_verify_deps(initd_list_t *ilp, initd_t *ip, initd_key_t key)
+{
+	dep_t *type;
+	char *missing = NULL;
+	int n;
+
+	if (!ilp || !ip)
+		goto out;
+
+	switch (key) {
+	case KEY_RSTART:
+		type = ip->rstart;
+		break;
+	case KEY_RSTOP:
+		type = ip->rstop;
+		break;
+	case KEY_SSTART:
+		type = ip->sstart;
+		break;
+	case KEY_SSTOP:
+		type = ip->sstop;
+		break;
+	default:
+		/* Not a valid key for this function */
+		goto out;
+	}
+
+	if (!type)
+		goto out;
+
+	for (n = 0; n < type->ndep; n++) {
+		if (!initd_list_provides(ilp, type->dep[n])) {
+			missing = d_string_new(type->dep[n]);
+			break;
+		}
+	}
+
+out:
+	return missing;
+}
+
 /* Ensure that the dependencies for each initd in the list exist in the
  * list as their own initd. Returns NULL if all the deps have been found
  * or the name of the first missing dep if not.
  */
 char *initd_list_verify_all(initd_list_t *ilp)
 {
-	int n;
 	char *missing = NULL;
-	initd_t *ip;
+	initd_t *cur;
 
 	if (!ilp)
 		goto out;
 
-	for (ip = ilp->first; ip; ip = ip->next) {
-		for (n = 0; n < ip->deps->ndep; n++) {
-			if (initd_list_exists_name(ilp,
-				ip->deps->dep[n]) != 0) {
-				missing = d_string_new(ip->deps->dep[n]);
-				break;
-			}
-		}
+	for (cur = ilp->first; cur; cur = cur->next) {
+		missing = initd_verify_deps(ilp, cur, KEY_RSTART);
+		if (missing)
+			break;
+		missing = initd_verify_deps(ilp, cur, KEY_RSTOP);
+		if (missing)
+			break;
 	}
 
 out:
