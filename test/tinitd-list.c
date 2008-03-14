@@ -15,12 +15,16 @@ int main(int argc, char *argv[])
 
 	/* test dep list */
 	i1 = initd_new("i1");
-	initd_add(i1, "i2");
+	initd_add_prov(i1, "s1");
+	initd_add_rstart(i1, "$network");
 	i2 = initd_new("i2");
-	initd_add(i2, "i3");
+	initd_add_prov(i2, "$network");
+	initd_add_rstop(i2, "s3");
 	i3 = initd_new("i3");
+	initd_add_prov(i3, "s3");
 	i4 = initd_new("i4");
-	initd_add(i4, "barf");
+	initd_add_prov(i4, "s4");
+	initd_add_rstart(i4, "barf");
 
 	il1 = initd_list_new();
 	initd_list_add(il1, i1);
