@@ -31,12 +31,13 @@ typedef enum initd_key {
 
 typedef enum initd_rc {
 	RC_SI = (1 << 0),  /* rcsysinit.d */
-	RC_0  = (1 << 1),  /* rc1.d */
-	RC_2  = (1 << 2),  /* rc2.d */
-	RC_3  = (1 << 3),  /* rc3.d */
-	RC_4  = (1 << 4),  /* rc4.d */
-	RC_5  = (1 << 5),  /* rc5.d */
-	RC_6  = (1 << 6)   /* rc6.d */
+	RC_0  = (1 << 1),  /* rc0.d */
+	RC_1  = (1 << 2),  /* rc1.d */
+	RC_2  = (1 << 3),  /* rc2.d */
+	RC_3  = (1 << 4),  /* rc3.d */
+	RC_4  = (1 << 5),  /* rc4.d */
+	RC_5  = (1 << 6),  /* rc5.d */
+	RC_6  = (1 << 7)   /* rc6.d */
 } initd_rc_t;
 
 typedef struct initd {
