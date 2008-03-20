@@ -6,15 +6,13 @@
 #include "initd.h"
 #include "str.h"
 
+static void print_initd(initd_t *ip);
+static void print_level(initd_rc_t rc);
+
 int main(int argc, char *argv[])
 {
 	initd_t *t;
 	char *tpath;
-
-	if (setenv("INITD_DIR", ".", 0) < 0) {
-		printf("Error setting the INITD_DIR envvar\n");
-		exit(1);
-	}
 
 	if (argc > 1) {
 		tpath = argv[1];
@@ -24,8 +22,54 @@ int main(int argc, char *argv[])
 	}
 
 	printf("Opening script %s\n", tpath);
-	t = initd_new(tpath);
-	initd_parse(t);
+	t = initd_parse(tpath);
+	print_initd(t);
 
 	return 0;
+}
+
+static void print_initd(initd_t *ip)
+{
+	int n;
+
+	printf("%s: %s\n\n%s\n\n", ip->name, ip->sdesc, ip->desc);
+	printf("Provides:");
+	for (n = 0; n < ip->prov->nprov; n++)
+		printf(" %s", ip->prov->prov[n]);
+	putchar('\n');
+	printf("Default start levels:");
+	print_level(ip->dstart);
+	putchar('\n');
+	printf("Default stop levels:");
+	print_level(ip->dstop);
+	putchar('\n');
+
+	printf("Required start after:");
+	for (n = 0; n < ip->rstart->ndep; n++)
+		printf(" %s", ip->rstart->dep[n]);
+	putchar('\n');
+	printf("Required stop before:");
+	for (n = 0; n < ip->rstop->ndep; n++)
+		printf(" %s", ip->rstop->dep[n]);
+	putchar('\n');
+	printf("Should start after:");
+	for (n = 0; n < ip->sstart->ndep; n++)
+		printf(" %s", ip->sstart->dep[n]);
+	putchar('\n');
+	printf("Should stop before:");
+	for (n = 0; n < ip->sstop->ndep; n++)
+		printf(" %s", ip->sstop->dep[n]);
+	putchar('\n');
+}
+
+static void print_level(initd_rc_t rc)
+{
+	if (rc & RC_SI) printf(" sysinit");
+	if (rc & RC_0) printf(" 0");
+	if (rc & RC_1) printf(" 1");
+	if (rc & RC_2) printf(" 2");
+	if (rc & RC_3) printf(" 3");
+	if (rc & RC_4) printf(" 4");
+	if (rc & RC_5) printf(" 5");
+	if (rc & RC_6) printf(" 6");
 }

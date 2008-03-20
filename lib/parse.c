@@ -7,23 +7,29 @@
 #include <error.h>
 #include <errno.h>
 #include <ctype.h>
+#include <libgen.h>
 #include "initd.h"
 
-static char *initd_get_initddir(void);
-static FILE *initd_open(initd_t *ip);
+static FILE *initd_open(const char *path);
 static void initd_close(FILE *ifd);
 static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 					initd_key_t prev);
 static initd_key_t initd_string_to_key(const char *s);
+static initd_rc_t initd_convert_to_rc(const char *tok);
+static void initd_parse_line_tokens(initd_t *ip, const char *line,
+					initd_key_t key);
 
-/* Parse an initd script. Returns 0 on success. */
-int initd_parse(initd_t *ip)
+/* Parse an initd script. Returns an allocated initd_t. */
+initd_t *initd_parse(const char *path)
 {
 	char line[INITD_LINE_MAX];
 	size_t nchar;
 	int in_header;
 	initd_key_t key;
-	FILE *ifd = initd_open(ip);
+	initd_t *ip = NULL;
+	FILE *ifd = initd_open(path);
+
+	ip = initd_new(basename((char *)path));
 
 	in_header = 0;
 	key = KEY_NONE;
@@ -52,40 +58,16 @@ int initd_parse(initd_t *ip)
 		error(2, errno, "%s", __FUNCTION__);
 
 	initd_close(ifd);
-	return 0;
+	return ip;
 }
 
-/* Where to search for scripts: check environment variable INITD_DIR and
- * fall back to DEF_INITD_DIR.
- */
-char *initd_get_initddir(void) {
-	char *id;
-
-	id = getenv("INITD_DIR");
-	if (!id)
-		id = DEF_INITD_DIR;
-
-	return id;
-}
-
-FILE *initd_open(initd_t *ip)
+FILE *initd_open(const char *path)
 {
 	FILE *fd = NULL;
-	char *initd_dir, *path;
-	int plen;
 
-	/* return if no name for the initd */
-	if (!ip || !ip->name)
-		goto out;
-
-	initd_dir = initd_get_initddir();
-
-	plen = strlen(initd_dir) + strlen(ip->name) + 2;
-	path = malloc(plen * sizeof(char));
+	/* return if no script name passed */
 	if (!path)
-		error(2, errno, "%s", __FUNCTION__);
-	if (sprintf(path, "%s/%s", initd_dir, ip->name) >= plen)
-		error(2, errno, "%s", __FUNCTION__);
+		goto out;
 
 	fd = fopen(path, "r");
 	if (!fd)
@@ -133,7 +115,7 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 			pos++;
 			value = d_string_new(pos);
 			key = KEY_DESC;
-			goto print;
+			goto desc;
 		} else {
 			key = KEY_ERR;
 			goto out;
@@ -154,7 +136,7 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 		pos++;
 		value = d_string_new(pos);
 		key = KEY_DESC;
-		goto print;
+		goto desc;
 	}
 
 	/* The special case of the description field has now been
@@ -212,14 +194,41 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 			break;
 	}
 
-print:
+#if 0
 	if (!kstring)
 		kstring = "Description";
 	if (!value)
 		value = "";
 	printf("key type = %d, key = '%s', value = '%s'\n", key,
 		kstring, value);
+#endif
+
+	switch(key) {
+	case KEY_PROV:
+	case KEY_DSTART:
+	case KEY_DSTOP:
+	case KEY_RSTART:
+	case KEY_RSTOP:
+	case KEY_SSTART:
+	case KEY_SSTOP:
+		initd_parse_line_tokens(ip, value, key);
+		break;
+	case KEY_SDESC:
+		initd_set_sdesc(ip, value);
+		break;
+	case KEY_DESC:
+		initd_set_desc(ip, value);
+		break;
+	default:
+		break;
+	}
+	goto out;
+
+desc:
+	/* we have an extended description */
+	initd_add_desc(ip, value);
 out:
+	d_string_free(value);
 	return key;
 }
 
@@ -255,4 +264,93 @@ static initd_key_t initd_string_to_key(const char *s)
 		key = KEY_ERR;
 out:
 	return key;
+}
+
+/* Convert a single token from Default-{Start,Stop} strings into
+ * an initd_rc_t */
+static initd_rc_t initd_convert_to_rc(const char *tok)
+{
+	initd_rc_t lev = 0;
+
+	if (!tok)
+		goto out;
+
+	if (strcmp(tok, "si") == 0)
+		lev = RC_SI;
+	else if (*tok == '0')
+		lev = RC_0;
+	else if (*tok == '1')
+		lev = RC_1;
+	else if (*tok == '2')
+		lev = RC_2;
+	else if (*tok == '3')
+		lev = RC_3;
+	else if (*tok == '4')
+		lev = RC_4;
+	else if (*tok == '5')
+		lev = RC_5;
+	else if (*tok == '6')
+		lev = RC_6;
+out:
+	return lev;
+}
+
+/* Parse tokens from a line and convert them to the key types */
+static void initd_parse_line_tokens(initd_t *ip, const char *line,
+					initd_key_t key)
+{
+	char *a, *b;
+
+	if (!ip || !line)
+		return;
+
+	b = (char *)line;
+
+	while (1) {
+		char *tok;
+
+		while (isspace(*b))
+			b++;
+		if (*b == '\0')
+			break;
+		a = b++;
+		while (!(*b == '\0' || isspace(*b)))
+			b++;
+
+		/* reached end of line or space following token */
+		tok = strndup(a, b-a);
+		if (!tok)
+			error(2, errno, "%s", __FUNCTION__);
+
+		switch(key) {
+		case KEY_DSTART:
+			ip->dstart |= initd_convert_to_rc(tok);
+			break;
+		case KEY_DSTOP:
+			ip->dstop |= initd_convert_to_rc(tok);
+			break;
+		case KEY_PROV:
+			initd_add_prov(ip, tok);
+			break;
+		case KEY_RSTART:
+			initd_add_rstart(ip, tok);
+			break;
+		case KEY_RSTOP:
+			initd_add_rstop(ip, tok);
+			break;
+		case KEY_SSTART:
+			initd_add_sstart(ip, tok);
+			break;
+		case KEY_SSTOP:
+			initd_add_sstop(ip, tok);
+			break;
+		default:
+			break;
+		}
+
+		d_string_free(tok);
+
+		if (*b == '\0')
+			break;
+	}
 }

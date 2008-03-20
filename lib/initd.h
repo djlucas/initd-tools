@@ -69,7 +69,7 @@ typedef struct initd_list {
 extern initd_t *initd_new(const char *name);
 extern void initd_free(initd_t *ip);
 extern initd_t *initd_copy(initd_t *source);
-extern int initd_parse(initd_t *ip);
+extern initd_t *initd_parse(const char *path);
 
 /* Setters */
 #define initd_add_prov(ip, name) prov_add(ip->prov, name)
