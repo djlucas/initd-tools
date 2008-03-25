@@ -20,4 +20,8 @@ lib/Makefile
 test/Makefile
 ])
 
+AC_CONFIG_COMMANDS([mode],[
+chmod +x $srcdir/test/tparse.sh $srcdir/test/tparse-dir.sh
+])
+
 AC_OUTPUT

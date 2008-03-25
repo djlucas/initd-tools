@@ -1,0 +1,23 @@
+#!/bin/sh
+# Begin $rc_base/init.d/bar
+
+### BEGIN INIT INFO
+# Provides  :           bar baz
+# Default-Start:        5
+# Default-Stop:         0 1 2 3 4 6
+# Required-Start:       $network
+# Required-Stop:        $network
+# Should-Start:         dbus
+# Should-Stop:          dbus
+# Short-Description:    bar test service
+# Description:          The bar service is used for testing out out
+#	the initd-tools functions.
+### END INIT INFO
+
+# Do some other stuff
+case "$1" in
+start)
+	;;
+stop)
+	;;
+esac

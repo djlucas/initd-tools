@@ -6,6 +6,14 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <dirent.h>
+#ifndef _DIRENT_HAVE_D_TYPE
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+#include <limits.h>
+#include <stdio.h>
 #include "initd.h"
 #include "str.h"
 
@@ -56,6 +64,57 @@ void initd_list_add(initd_list_t *ilp, initd_t *ip)
 		ip->prev = cur;
 	}
 	ilp->last = ip;
+}
+
+initd_list_t *initd_list_from_dir(const char *dir)
+{
+	initd_list_t *ilp;
+	DIR *dfd;
+	struct dirent *de;
+	initd_t *ip;
+
+	ilp = initd_list_new();
+
+	if (!dir)
+		goto out;
+
+	dfd = opendir(dir);
+	if (!dfd)
+		error(2, errno, "%s", dir);
+
+	while ((de = readdir(dfd))) {
+		char ip_path[PATH_MAX];
+		int plen;
+		if (!de->d_name)
+			continue;
+
+		plen = snprintf(ip_path, PATH_MAX, "%s/%s", dir, de->d_name);
+		if (plen < 0)
+			error(2, errno, "%s", de->d_name);
+
+#ifdef _DIRENT_HAVE_D_TYPE
+		if ((!de->d_type) || (de->d_type != DT_REG))
+			continue;
+#else
+		struct stat ip_buf;
+		if (stat(ip_path, &ip_buf) < 0)
+			error(2, errno, "%s", ip_path);
+		if (!S_ISREG(ip_buf.st_mode))
+			continue;
+#endif /* _DIRENT_HAVE_D_TYPE */
+
+		ip = initd_parse(ip_path);
+		initd_list_add(ilp, ip);
+	}
+
+	/* if errno is set, readdir had issues */
+	if (errno)
+		error(2, errno, "%s", dir);
+
+	if (closedir(dfd) != 0)
+		error(2, errno, "%s", dir);
+out:
+	return ilp;
 }
 
 initd_list_t *initd_list_copy(initd_list_t *source)
