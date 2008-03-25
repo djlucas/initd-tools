@@ -1,5 +1,6 @@
 #!/bin/sh
 
-tscript="$srcdir/test-script"
+: ${srcdir:=.}
+: ${builddir:=.}
 
-exec "./tparse" "$tscript"
+exec "$builddir/tparse" "$srcdir/init.d/foo"

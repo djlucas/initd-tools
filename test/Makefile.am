@@ -1,6 +1,6 @@
 INCLUDES = -I$(top_srcdir)/lib
 
-testscripts = test-script init.d/bar init.d/foo
+testscripts = init.d/bar init.d/foo
 
 EXTRA_DIST = $(testscripts)
 TESTS = tstr tstrarg tdep $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh \
