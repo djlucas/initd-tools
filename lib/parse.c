@@ -19,19 +19,20 @@ static initd_rc_t initd_convert_to_rc(const char *tok);
 static void initd_parse_line_tokens(initd_t *ip, const char *line,
 					initd_key_t key);
 
-/* Parse an initd script. Returns an allocated initd_t. */
+/* Parse an initd script. Returns an allocated initd_t or NULL if the
+   script was not valid. */
 initd_t *initd_parse(const char *path)
 {
 	char line[INITD_LINE_MAX];
 	size_t nchar;
-	int in_header;
+	int in_header, is_initd;
 	initd_key_t key;
 	initd_t *ip = NULL;
 	FILE *ifd = initd_open(path);
 
 	ip = initd_new(basename((char *)path));
 
-	in_header = 0;
+	in_header = is_initd = 0;
 	key = KEY_NONE;
 	while (fgets(line, sizeof(line), ifd)) {
 		/* replace the newline */
@@ -46,10 +47,12 @@ initd_t *initd_parse(const char *path)
 		}
 
 		/* check for the closing header marker */
-		if (in_header && strcmp(line, "### END INIT INFO") == 0)
+		if (in_header && strcmp(line, "### END INIT INFO") == 0) {
+			is_initd = 1;
 			break;
+		}
 
-		/* print the line if we're in the header */
+		/* parse the line if we're in the header */
 		if (in_header)
 			key = initd_parse_line(ip, line, key);
 	}
@@ -58,6 +61,13 @@ initd_t *initd_parse(const char *path)
 		error(2, errno, "%s", __FUNCTION__);
 
 	initd_close(ifd);
+
+	/* return NULL if this wasn't a valid init script */
+	if (!is_initd) {
+		initd_free(ip);
+		ip = NULL;
+	}
+
 	return ip;
 }
 

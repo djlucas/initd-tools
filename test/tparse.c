@@ -23,7 +23,10 @@ int main(int argc, char *argv[])
 
 	printf("Opening script %s\n", tpath);
 	t = initd_parse(tpath);
-	print_initd(t);
+	if (t)
+		print_initd(t);
+	else
+		printf("Invalid script %s, skipping\n", tpath);
 
 	return 0;
 }
