@@ -150,15 +150,13 @@ out:
 	return ip;
 }
 
-/* Verify that a given named initd exists in the list. Returns 0 for
- * success and 1 for failure.
- */
-int initd_list_exists_name(initd_list_t *ilp, const char *name)
+/* Verify that a given named initd exists in the list. */
+bool initd_list_exists_name(initd_list_t *ilp, const char *name)
 {
 	if (initd_list_find_name(ilp, name))
-		return 0;
+		return true;
 	else
-		return 1;
+		return false;
 }
 
 /* Find whether a given service is provided by an initd. */

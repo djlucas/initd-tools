@@ -88,7 +88,7 @@ extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
 extern initd_list_t *initd_list_from_dir(const char *dir);
 extern initd_list_t *initd_list_copy(initd_list_t *source);
 extern initd_t *initd_list_find_name(initd_list_t *ilp, const char *name);
-extern int initd_list_exists_name(initd_list_t *ilp, const char *name);
+extern bool initd_list_exists_name(initd_list_t *ilp, const char *name);
 
 /* Verification */
 extern bool initd_provides(initd_t *ip, const char *serv);
