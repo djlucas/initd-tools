@@ -32,6 +32,14 @@ int main(int argc, char *argv[])
 	else
 		printf("Didn't find \"barf\" in test\n");
 
+	printf("Removing last two elements\n");
+	test = strarg_pop(test, &num);
+	test = strarg_pop(test, &num);
+
+	printf("Contents of test strarg\n");
+	for (n = 0; n < num; n++)
+		printf("Arg %d: %s\n", n, test[n]);
+
 	strarg_free(test, num);
 
 	return 0;

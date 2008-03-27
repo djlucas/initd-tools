@@ -49,6 +49,31 @@ char **strarg_add(char **strarg, unsigned int *num, const char *s)
 	return strarg;
 }
 
+/* remove the last element from the strarg */
+char **strarg_pop(char **strarg, unsigned int *num)
+{
+	int len;
+
+	if (!strarg || !num)
+		goto out;
+
+	len = *num;
+
+	/* free the last (nth) element */
+	d_string_free(strarg[len - 1]);
+
+	/* resize for one less element */
+	strarg = realloc(strarg, len * sizeof(char *));
+	if (!strarg)
+		error(2, errno, "%s", __FUNCTION__);
+
+	strarg[--(*num)] = NULL;
+out:
+	if (!strarg)
+		strarg = NULL;
+	return strarg;
+}
+
 /* Find if a given string exists in the strarg array. */
 bool strarg_exists(char **strarg, unsigned int num, const char *s)
 {
