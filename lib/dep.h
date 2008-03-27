@@ -11,6 +11,7 @@ typedef struct dep {
 extern dep_t *dep_new(void);
 extern void dep_free(dep_t *dp);
 extern void dep_add(dep_t *dp, const char *name);
+extern void dep_pop(dep_t *dp);
 extern dep_t *dep_copy(dep_t *source);
 #define dep_exists(dp, name) strarg_exists(dp->dep, dp->ndep, name)
 

@@ -24,7 +24,15 @@ int main(int argc, char *argv[])
 	bar = dep_copy(foo);
 	dep_add(bar, "again");
 
+	printf("Contents of bar dep:\n");
 	print_dep(bar);
+
+	printf("Removing last two deps from foo\n");
+	dep_pop(foo);
+	dep_pop(foo);
+
+	printf("Contents of foo dep:\n");
+	print_dep(foo);
 
 	dep_free(foo);
 	dep_free(bar);

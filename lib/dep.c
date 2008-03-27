@@ -37,6 +37,12 @@ void dep_add(dep_t *dp, const char *name)
 	dp->dep = strarg_add(dp->dep, &dp->ndep, name);
 }
 
+void dep_pop(dep_t *dp)
+{
+	if (dp)
+		dp->dep = strarg_pop(dp->dep, &dp->ndep);
+}
+
 dep_t *dep_copy(dep_t *source)
 {
 	int n;
