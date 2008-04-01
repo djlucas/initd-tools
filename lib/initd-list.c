@@ -231,9 +231,9 @@ char *initd_verify_deps(initd_list_t *ilp, initd_t *ip, initd_key_t key)
 	if (!type)
 		goto out;
 
-	for (n = 0; n < type->ndep; n++) {
-		if (!initd_list_provides(ilp, type->dep[n])) {
-			missing = d_string_new(type->dep[n]);
+	for (n = 0; n < dep_get_num(type); n++) {
+		if (!initd_list_provides(ilp, dep_get_dep(type, n))) {
+			missing = d_string_new(dep_get_dep(type, n));
 			break;
 		}
 	}

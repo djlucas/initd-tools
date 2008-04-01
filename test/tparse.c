@@ -48,20 +48,20 @@ static void print_initd(initd_t *ip)
 	putchar('\n');
 
 	printf("Required start after:");
-	for (n = 0; n < ip->rstart->ndep; n++)
-		printf(" %s", ip->rstart->dep[n]);
+	for (n = 0; n < dep_get_num(ip->rstart); n++)
+		printf(" %s", dep_get_dep(ip->rstart, n));
 	putchar('\n');
 	printf("Required stop before:");
-	for (n = 0; n < ip->rstop->ndep; n++)
-		printf(" %s", ip->rstop->dep[n]);
+	for (n = 0; n < dep_get_num(ip->rstop); n++)
+		printf(" %s", dep_get_dep(ip->rstop, n));
 	putchar('\n');
 	printf("Should start after:");
-	for (n = 0; n < ip->sstart->ndep; n++)
-		printf(" %s", ip->sstart->dep[n]);
+	for (n = 0; n < dep_get_num(ip->sstart); n++)
+		printf(" %s", dep_get_dep(ip->sstart, n));
 	putchar('\n');
 	printf("Should stop before:");
-	for (n = 0; n < ip->sstop->ndep; n++)
-		printf(" %s", ip->sstop->dep[n]);
+	for (n = 0; n < dep_get_num(ip->sstop); n++)
+		printf(" %s", dep_get_dep(ip->sstop, n));
 	putchar('\n');
 }
 

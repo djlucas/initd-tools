@@ -51,8 +51,8 @@ dep_t *dep_copy(dep_t *source)
 	if (!source)
 		goto out;
 
-	for (n = 0; n < source->ndep; n++)
-		dep_add(tgt, source->dep[n]);
+	for (n = 0; n < dep_get_num(source); n++)
+		dep_add(tgt, dep_get_dep(source, n));
 
 out:
 	return tgt;
