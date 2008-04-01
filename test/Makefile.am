@@ -21,3 +21,7 @@ tinitd_SOURCES = tinitd.c
 tinitd_LDADD = $(top_builddir)/lib/libinitd.la
 tinitd_list_SOURCES = tinitd-list.c
 tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
+
+noinst_PROGRAMS = deps
+deps_SOURCES = deps.c
+deps_LDADD = $(top_builddir)/lib/libinitd.la
