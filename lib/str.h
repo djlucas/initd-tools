@@ -18,4 +18,7 @@ extern char **strarg_add(char **strarg, unsigned int *num, const char *s);
 extern char **strarg_pop(char **strarg, unsigned int *num);
 extern bool strarg_exists(char **strarg, unsigned int num, const char *s);
 
+extern unsigned int strarg_get_num(strarg_t *sp);
+extern char *strarg_get_str(strarg_t *sp, unsigned int index);
+
 #endif /* _str_h_ */

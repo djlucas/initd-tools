@@ -93,3 +93,19 @@ bool strarg_exists(char **strarg, unsigned int num, const char *s)
 out:
 	return found;
 }
+
+unsigned int strarg_get_num(strarg_t *sp)
+{
+	if (sp)
+		return sp->nstr;
+	else
+		return 0;
+}
+
+char *strarg_get_str(strarg_t *sp, unsigned int index)
+{
+	if (sp && index <= strarg_get_num(sp))
+		return sp->str[index];
+	else
+		return NULL;
+}
