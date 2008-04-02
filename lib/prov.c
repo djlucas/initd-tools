@@ -46,8 +46,8 @@ prov_t *prov_copy(prov_t *source)
 	if (!source)
 		goto out;
 
-	for (n = 0; n < source->nprov; n++)
-		prov_add(tgt, source->prov[n]);
+	for (n = 0; n < prov_get_num(source); n++)
+		prov_add(tgt, prov_get_prov(source, n));
 
 out:
 	return tgt;

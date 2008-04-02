@@ -57,9 +57,9 @@ static void print_initd(initd_t *ip)
 	printf("Description: %s\n", ip->desc);
 
 	printf("initd \"%s\" provides %d services:\n", ip->name,
-		ip->prov->nprov);
-	for (n = 0; n < ip->prov->nprov; n++)
-		printf(" %d: %s\n", n, ip->prov->prov[n]);
+		prov_get_num(ip->prov));
+	for (n = 0; n < prov_get_num(ip->prov); n++)
+		printf(" %d: %s\n", n, prov_get_prov(ip->prov, n));
 
 	printf("initd \"%s\" must start after %d services:\n", ip->name,
 		dep_get_num(ip->rstart));

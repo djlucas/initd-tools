@@ -168,8 +168,8 @@ bool initd_provides(initd_t *ip, const char *serv)
 	if (!ip || !ip->prov)
 		goto out;
 
-	for (n = 0; n < ip->prov->nprov; n++) {
-		if (strcmp(serv, ip->prov->prov[n]) == 0) {
+	for (n = 0; n < prov_get_num(ip->prov); n++) {
+		if (strcmp(serv, prov_get_prov(ip->prov, n)) == 0) {
 			found = true;
 			break;
 		}

@@ -37,8 +37,8 @@ static void print_initd(initd_t *ip)
 
 	printf("%s: %s\n\n%s\n\n", ip->name, ip->sdesc, ip->desc);
 	printf("Provides:");
-	for (n = 0; n < ip->prov->nprov; n++)
-		printf(" %s", ip->prov->prov[n]);
+	for (n = 0; n < prov_get_num(ip->prov); n++)
+		printf(" %s", prov_get_prov(ip->prov, n));
 	putchar('\n');
 	printf("Default start levels:");
 	print_level(ip->dstart);
