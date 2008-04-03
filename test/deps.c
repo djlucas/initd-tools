@@ -10,14 +10,14 @@
 #include "str.h"
 
 static bool verbose = true;
-static dep_t *process_deps(initd_list_t *pool, const char **needed);
+static dep_t *process_deps(initd_list_t *pool, const dep_t *needed);
 static void msg_fill(FILE *fd, int num, const char *format, ...);
 
 int main(int argc, char *argv[])
 {
 	initd_list_t *all;
 	initd_t *a, *b, *c, *d;
-	dep_t *deplist;
+	dep_t *deplist, *need;
 	int n;
 
 	a = initd_new("a");
@@ -46,15 +46,16 @@ int main(int argc, char *argv[])
 	initd_list_add(all, c);
 	initd_list_add(all, d);
 
-	char *need[] = { "a", NULL };
+	need = dep_new();
+	dep_add(need, "a");
 
-	deplist = process_deps(all, (const char **) need);
+	deplist = process_deps(all, need);
 
 	if (deplist) {
-		printf("%d deps\n", deplist->ndep);
+		printf("%d deps\n", dep_get_num(deplist));
 		printf("Ordered:");
-		for (n = 0; n < deplist->ndep; n++)
-			printf(" %s", deplist->dep[n]);
+		for (n = 0; n < dep_get_num(deplist); n++)
+			printf(" %s", dep_get_dep(deplist, n));
 		printf("\n");
 	} else {
 		printf("Deplist is empty\n");
@@ -63,7 +64,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-static dep_t *process_deps(initd_list_t *pool, const char **needed)
+static dep_t *process_deps(initd_list_t *pool, const dep_t *needed)
 {
 	int n;
 	initd_t *cur;
@@ -81,11 +82,12 @@ static dep_t *process_deps(initd_list_t *pool, const char **needed)
 	if (!chain_deps)
 		chain_deps = dep_new();
 
-	for (n = 0; needed[n]; n++) {
+	for (n = 0; n < dep_get_num((dep_t *)needed); n++) {
 		/* find the initd in pool matching this name */
-		cur = initd_list_find_name(pool, needed[n]);
+		char *cdep = dep_get_dep((dep_t *)needed, n);
+		cur = initd_list_find_name(pool, cdep);
 		if (!cur) {
-			fprintf(stderr, "No init script named %s\n", needed[n]);
+			fprintf(stderr, "No init script named %s\n", cdep);
 			goto out;
 		}
 
@@ -116,7 +118,7 @@ static dep_t *process_deps(initd_list_t *pool, const char **needed)
 		/* process its dependencies */
 		level++;
 		parent = cur->name;
-		process_deps(pool, (const char **) cur->rstart->dep);
+		process_deps(pool, cur->rstart);
 		parent = cur->name;
 		level--;
 
