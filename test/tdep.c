@@ -3,7 +3,7 @@
 #endif
 #include <stdio.h>
 #include <string.h>
-#include "dep.h"
+#include "types.h"
 
 static void print_dep(dep_t *sa);
 
@@ -47,6 +47,6 @@ void print_dep(dep_t *dp)
 	if (!dp)
 		return;
 
-	for (n = 0; n < dp->ndep; n++)
-		printf("Dep %d: %s\n", n, dp->dep[n]);
+	for (n = 0; n < dep_get_num(dp); n++)
+		printf("Dep %d: %s\n", n, dep_get_dep(dp, n));
 }

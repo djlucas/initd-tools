@@ -26,8 +26,8 @@ static void print_list(const initd_list_t *list)
 	int n;
 	for (ip = list->first; ip; ip = ip->next) {
 		printf("Service %s provides:", ip->name);
-		for (n = 0; n < ip->prov->nprov; n++)
-			printf(" %s", ip->prov->prov[n]);
+		for (n = 0; n < prov_get_num(ip->prov); n++)
+			printf(" %s", prov_get_prov(ip->prov, n));
 		printf("\n");
 	}
 }

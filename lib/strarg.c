@@ -7,84 +7,84 @@
 #include <string.h>
 #include "str.h"
 
-char **strarg_new(unsigned int *num)
+strarg_t *strarg_new(void)
 {
-	char **sa = malloc(sizeof(char *));
-	if (!sa)
+	strarg_t *sp = malloc(sizeof(strarg_t));
+	if (!sp)
 		error(2, errno, "%s", __FUNCTION__);
 
-	*num = 0;
-	*sa = NULL;
+	sp->str = malloc(sizeof(char *));
+	if (!sp)
+		error(2, errno, "%s", __FUNCTION__);
 
-	return sa;
+	*(sp->str) = NULL;
+	sp->nstr = 0;
+
+	return sp;
 }
 
-void strarg_free(char **strarg, unsigned int num)
+void strarg_free(strarg_t *sp)
 {
 	int n;
 
-	if (!strarg)
-		goto out;
+	if (!sp)
+		return;
 
-	for (n = 0; n < num; n++)
-		d_string_free(strarg[n]);
+	for (n = 0; n < sp->nstr; n++)
+		d_string_free(sp->str[n]);
 
-	free(strarg);
-out:
-	strarg = NULL;
+	free(sp->str);
+	sp->str = NULL;
+
+	free(sp);
+	sp = NULL;
 }
 
-char **strarg_add(char **strarg, unsigned int *num, const char *s)
+void strarg_add(strarg_t *sp, const char *s)
 {
-	if (!strarg)
-		strarg = strarg_new(num);
+	if (!sp)
+		sp = strarg_new();
 
-	strarg = realloc(strarg, (*num + 2) * sizeof(char *));
-	if (!strarg)
+	sp->str = realloc(sp->str, (sp->nstr + 2) * sizeof(char *));
+	if (!sp)
 		error(2, errno, "%s", __FUNCTION__);
 
-	strarg[(*num)++] = d_string_new(s);
-	strarg[*num] = NULL;
-
-	return strarg;
+	sp->str[(sp->nstr)++] = d_string_new(s);
+	sp->str[sp->nstr] = NULL;
 }
 
 /* remove the last element from the strarg */
-char **strarg_pop(char **strarg, unsigned int *num)
+void strarg_pop(strarg_t *sp)
 {
 	int len;
 
-	if (!strarg || !num)
-		goto out;
+	if (!sp)
+		return;
 
-	len = *num;
+	len = sp->nstr;
 
 	/* free the last (nth) element */
-	d_string_free(strarg[len - 1]);
+	d_string_free(sp->str[len - 1]);
 
 	/* resize for one less element */
-	strarg = realloc(strarg, len * sizeof(char *));
-	if (!strarg)
+	sp->str = realloc(sp->str, len * sizeof(char *));
+	if (!sp->str)
 		error(2, errno, "%s", __FUNCTION__);
 
-	strarg[--(*num)] = NULL;
-out:
-	if (!strarg)
-		strarg = NULL;
-	return strarg;
+	sp->str[--(sp->nstr)] = NULL;
 }
 
 /* Find if a given string exists in the strarg array. */
-bool strarg_exists(char **strarg, unsigned int num, const char *s)
+bool strarg_exists(strarg_t *sp, const char *s)
 {
 	int n;
 	bool found = false;
 
-	if(!strarg)
+	if(!sp)
 		goto out;
 
-	for (n = 0; n < num; n++) {
-		if (strcmp(s, strarg[n]) == 0) {
+	for (n = 0; n < sp->nstr; n++) {
+		if (strcmp(s, sp->str[n]) == 0) {
 			found = true;
 			break;
 		}
@@ -92,4 +92,36 @@ bool strarg_exists(char **strarg, unsigned int num, const char *s)
 
 out:
 	return found;
+}
+
+unsigned int strarg_get_num(strarg_t *sp)
+{
+	if (sp)
+		return sp->nstr;
+	else
+		return 0;
+}
+
+char *strarg_get_str(strarg_t *sp, unsigned int index)
+{
+	if (sp && index <= sp->nstr)
+		return sp->str[index];
+	else
+		return NULL;
+}
+
+
+strarg_t *strarg_copy(strarg_t *source)
+{
+	int n;
+	strarg_t *dest = strarg_new();
+
+	if (!dest)
+		goto out;
+
+	for (n = 0; n < strarg_get_num(source); n++)
+		strarg_add(dest, strarg_get_str(source, n));
+
+out:
+	return dest;
 }

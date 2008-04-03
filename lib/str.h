@@ -12,10 +12,13 @@ typedef struct strarg {
 	char **str;
 } strarg_t;
 
-extern char **strarg_new(unsigned int *num);
-extern void strarg_free(char **strarg, unsigned int num);
-extern char **strarg_add(char **strarg, unsigned int *num, const char *s);
-extern char **strarg_pop(char **strarg, unsigned int *num);
-extern bool strarg_exists(char **strarg, unsigned int num, const char *s);
+extern strarg_t *strarg_new(void);
+extern void strarg_free(strarg_t *sp);
+extern void strarg_add(strarg_t *sp, const char *s);
+extern void strarg_pop(strarg_t *sp);
+extern bool strarg_exists(strarg_t *sp, const char *s);
+extern unsigned int strarg_get_num(strarg_t *sp);
+extern char *strarg_get_str(strarg_t *sp, unsigned int index);
+extern strarg_t *strarg_copy(strarg_t *source);
 
 #endif /* _str_h_ */

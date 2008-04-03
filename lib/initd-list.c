@@ -168,8 +168,8 @@ bool initd_provides(initd_t *ip, const char *serv)
 	if (!ip || !ip->prov)
 		goto out;
 
-	for (n = 0; n < ip->prov->nprov; n++) {
-		if (strcmp(serv, ip->prov->prov[n]) == 0) {
+	for (n = 0; n < prov_get_num(ip->prov); n++) {
+		if (strcmp(serv, prov_get_prov(ip->prov, n)) == 0) {
 			found = true;
 			break;
 		}
@@ -231,9 +231,9 @@ char *initd_verify_deps(initd_list_t *ilp, initd_t *ip, initd_key_t key)
 	if (!type)
 		goto out;
 
-	for (n = 0; n < type->ndep; n++) {
-		if (!initd_list_provides(ilp, type->dep[n])) {
-			missing = d_string_new(type->dep[n]);
+	for (n = 0; n < dep_get_num(type); n++) {
+		if (!initd_list_provides(ilp, dep_get_dep(type, n))) {
+			missing = d_string_new(dep_get_dep(type, n));
 			break;
 		}
 	}

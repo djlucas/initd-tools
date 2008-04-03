@@ -57,27 +57,27 @@ static void print_initd(initd_t *ip)
 	printf("Description: %s\n", ip->desc);
 
 	printf("initd \"%s\" provides %d services:\n", ip->name,
-		ip->prov->nprov);
-	for (n = 0; n < ip->prov->nprov; n++)
-		printf(" %d: %s\n", n, ip->prov->prov[n]);
+		prov_get_num(ip->prov));
+	for (n = 0; n < prov_get_num(ip->prov); n++)
+		printf(" %d: %s\n", n, prov_get_prov(ip->prov, n));
 
 	printf("initd \"%s\" must start after %d services:\n", ip->name,
-		ip->rstart->ndep);
-	for (n = 0; n < ip->rstart->ndep; n++)
-		printf(" %d: %s\n", n, ip->rstart->dep[n]);
+		dep_get_num(ip->rstart));
+	for (n = 0; n < dep_get_num(ip->rstart); n++)
+		printf(" %d: %s\n", n, dep_get_dep(ip->rstart, n));
 
 	printf("initd \"%s\" must stop before %d services:\n", ip->name,
-		ip->rstop->ndep);
-	for (n = 0; n < ip->rstop->ndep; n++)
-		printf(" %d: %s\n", n, ip->rstop->dep[n]);
+		dep_get_num(ip->rstop));
+	for (n = 0; n < dep_get_num(ip->rstop); n++)
+		printf(" %d: %s\n", n, dep_get_dep(ip->rstop, n));
 
 	printf("initd \"%s\" should start after %d services:\n", ip->name,
-		ip->sstart->ndep);
-	for (n = 0; n < ip->sstart->ndep; n++)
-		printf(" %d: %s\n", n, ip->sstart->dep[n]);
+		dep_get_num(ip->sstart));
+	for (n = 0; n < dep_get_num(ip->sstart); n++)
+		printf(" %d: %s\n", n, dep_get_dep(ip->sstart, n));
 
 	printf("initd \"%s\" should stop before %d services:\n", ip->name,
-		ip->sstop->ndep);
-	for (n = 0; n < ip->sstop->ndep; n++)
-		printf(" %d: %s\n", n, ip->sstop->dep[n]);
+		dep_get_num(ip->sstop));
+	for (n = 0; n < dep_get_num(ip->sstop); n++)
+		printf(" %d: %s\n", n, dep_get_dep(ip->sstop, n));
 }
