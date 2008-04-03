@@ -2,23 +2,17 @@
 # include <config.h>
 #endif
 #include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <limits.h>
-#include <stdarg.h>
 #include "initd.h"
-#include "str.h"
+#include "types.h"
+#include "rdep.h"
 
-static bool verbose = true;
-static dep_t *process_deps(initd_list_t *pool, const dep_t *needed);
-static void msg_fill(FILE *fd, int num, const char *format, ...);
+static void print_sk_list(const dep_t *list, initd_sk_t sk);
 
 int main(int argc, char *argv[])
 {
 	initd_list_t *all;
 	initd_t *a, *b, *c, *d;
-	dep_t *deplist, *need;
-	int n;
+	dep_t *startlist, *stoplist, *need;
 
 	a = initd_new("a");
 	initd_add_prov(a, "a");
@@ -49,109 +43,41 @@ int main(int argc, char *argv[])
 	need = dep_new();
 	dep_add(need, "a");
 
-	deplist = process_deps(all, need);
+	startlist = initd_recurse_deps(all, RC_START, need);
+	print_sk_list(startlist, RC_START);
 
-	if (deplist) {
-		printf("%d deps\n", dep_get_num(deplist));
-		printf("Ordered:");
-		for (n = 0; n < dep_get_num(deplist); n++)
-			printf(" %s", dep_get_dep(deplist, n));
-		printf("\n");
-	} else {
-		printf("Deplist is empty\n");
-	}
+	/* FIXME: initd_recurse_deps can only be called once
+	stoplist = initd_recurse_deps(all, RC_STOP, need);
+	print_sk_list(stoplist, RC_STOP);
+	*/
 
 	return 0;
 }
 
-static dep_t *process_deps(initd_list_t *pool, const dep_t *needed)
+static void print_sk_list(const dep_t *list, initd_sk_t sk)
 {
+	char *startstop;
 	int n;
-	initd_t *cur;
-	static dep_t *all_deps = NULL;
-	static dep_t *chain_deps = NULL;
-	static char *parent = NULL;
-	static int level = 0;
 
-	if (!pool || !needed)
-		goto out;
-
-	/* initialize the dep lists if needed */
-	if (!all_deps)
-		all_deps = dep_new();
-	if (!chain_deps)
-		chain_deps = dep_new();
-
-	for (n = 0; n < dep_get_num((dep_t *)needed); n++) {
-		/* find the initd in pool matching this name */
-		char *cdep = dep_get_dep((dep_t *)needed, n);
-		cur = initd_list_find_name(pool, cdep);
-		if (!cur) {
-			fprintf(stderr, "No init script named %s\n", cdep);
-			goto out;
-		}
-
-		if (verbose)
-			msg_fill(stderr, level, "Checking %s\n", cur->name);
-
-		/* if this dep is already in all_deps, continue */
-		if (dep_exists(all_deps, cur->name)) {
-			if (verbose)
-				msg_fill(stderr, level, "Pruning %s\n",
-					cur->name);
-			continue;
-		}
-
-		/* if this dep is in chain_deps, we have a circular
-		 * dependency */
-		if (dep_exists(chain_deps, cur->name)) {
-			fprintf(stderr,
-				"Error: circular dependency %s -> %s\n",
-				parent ? parent : "", cur->name);
-			dep_free(all_deps);
-			goto out;
-		}
-
-		/* add it to the chain */
-		dep_add(chain_deps, cur->name);
-
-		/* process its dependencies */
-		level++;
-		parent = cur->name;
-		process_deps(pool, cur->rstart);
-		parent = cur->name;
-		level--;
-
-		/* If we got here, all the subdeps have been processed.
-		 * Add this dep to all_deps and remove it from
-		 * chain_deps. */
-		if (verbose)
-			msg_fill(stderr, level, "Adding %s\n", cur->name);
-		dep_add(all_deps, cur->name);
-		dep_pop(chain_deps);
+	switch (sk) {
+	case RC_START:
+		startstop = "start";
+		break;
+	case RC_STOP:
+		startstop = "stop";
+		break;
+	default:
+		startstop = "";
 	}
 
-out:
-	if (level == 0)
-		dep_free(chain_deps);
-	return all_deps;
-}
-
-static void msg_fill(FILE *fd, int num, const char *format, ...)
-{
-	char fill[LINE_MAX];
-	va_list args;
-
-	if (num > 0) {
-		if (num >= LINE_MAX)
-			num = LINE_MAX - 1;
-
-		memset(fill, '.', num);
-		fill[num] = '\0';
-		fprintf(fd, "%s", fill);
+	if (list) {
+		printf("%d deps for %s\n", dep_get_num(list), startstop);
+		printf("Ordered:");
+		for (n = 0; n < dep_get_num(list); n++)
+			printf(" %s", dep_get_dep(list, n));
+		printf("\n");
+	} else {
+		printf("%s list is empty\n", startstop);
 	}
 
-	va_start(args, format);
-	vfprintf(fd, format, args);
-	va_end(args);
 }

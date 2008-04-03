@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "types.h"
+#include "rdep.h"
 
 #ifndef DEF_INITD_DIR
 #define DEF_INITD_DIR "/etc/init.d"

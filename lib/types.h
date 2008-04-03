@@ -56,6 +56,12 @@ typedef enum initd_rc {
 	RC_6  = (1 << 7)   /* rc6.d */
 } initd_rc_t;
 
+/* start/stop (S/K) type */
+typedef enum initd_sk {
+	RC_START,  /* S??foo */
+	RC_STOP    /* K??foo */
+} initd_sk_t;
+
 /* The initd type */
 typedef struct initd {
 	char *name;
