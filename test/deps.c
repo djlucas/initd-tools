@@ -46,10 +46,8 @@ int main(int argc, char *argv[])
 	startlist = initd_recurse_deps(all, RC_START, need);
 	print_sk_list(startlist, RC_START);
 
-	/* FIXME: initd_recurse_deps can only be called once
 	stoplist = initd_recurse_deps(all, RC_STOP, need);
 	print_sk_list(stoplist, RC_STOP);
-	*/
 
 	return 0;
 }

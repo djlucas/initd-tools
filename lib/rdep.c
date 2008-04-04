@@ -10,26 +10,50 @@
 #include "rdep.h"
 
 static bool rdep_verbose = true;
+static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
+			const dep_t *needed, dep_t *all_deps,
+			dep_t *chain_deps, const char *parent);
 static void msg_fill(FILE *fd, int num, const char *format, ...);
 
 dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed)
 {
-	int n;
-	initd_t *cur;
-	static dep_t *all_deps = NULL;
-	static dep_t *chain_deps = NULL;
-	static char *parent = NULL;
-	static int level = 0;
+	dep_t *all = NULL, *chain;
+	bool success = false;
 
 	if (!pool || !needed)
 		goto out;
 
-	/* initialize the dep lists if needed */
-	if (!all_deps)
-		all_deps = dep_new();
-	if (!chain_deps)
-		chain_deps = dep_new();
+	/* initialize the dep lists */
+	all = dep_new();
+	chain = dep_new();
+
+	/* recurse over needed */
+	success = _recurse_deps(pool, sk, needed, all, chain, NULL);
+
+	dep_free(chain);
+out:
+	if (success) {
+		return all;
+	} else {
+		dep_free(all);
+		return NULL;
+	}
+}
+
+static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
+			const dep_t *needed, dep_t *all_deps,
+			dep_t *chain_deps, const char *parent)
+{
+	int n;
+	initd_t *cur;
+	bool success = true;
+	static int level = 0;
+
+	if (!(pool || needed || all_deps || chain_deps)) {
+		success = false;
+		goto out;
+	}
 
 	for (n = 0; n < dep_get_num((dep_t *)needed); n++) {
 		/* find the initd in pool matching this name */
@@ -37,6 +61,7 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		cur = initd_list_find_name(pool, cdep);
 		if (!cur) {
 			fprintf(stderr, "No init script named %s\n", cdep);
+			success = false;
 			goto out;
 		}
 
@@ -57,7 +82,7 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			fprintf(stderr,
 				"Error: circular dependency %s -> %s\n",
 				parent ? parent : "", cur->name);
-			dep_free(all_deps);
+			success = false;
 			goto out;
 		}
 
@@ -66,19 +91,25 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 
 		/* process its dependencies */
 		level++;
-		parent = cur->name;
 		switch (sk) {
 		case RC_START:
-			initd_recurse_deps(pool, sk, cur->rstart);
+			success = _recurse_deps(pool, sk, cur->rstart,
+						all_deps, chain_deps,
+						cur->name);
 			break;
 		case RC_STOP:
-			initd_recurse_deps(pool, sk, cur->rstop);
+			success = _recurse_deps(pool, sk, cur->rstop,
+						all_deps, chain_deps,
+						cur->name);
 			break;
 		default:
 			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
 		}
-		parent = cur->name;
 		level--;
+
+		/* Break from the loop if the recursion was a failure */
+		if (!success)
+			goto out;
 
 		/* If we got here, all the subdeps have been processed.
 		 * Add this dep to all_deps and remove it from
@@ -90,9 +121,7 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	}
 
 out:
-	if (level == 0)
-		dep_free(chain_deps);
-	return all_deps;
+	return success;
 }
 
 static void msg_fill(FILE *fd, int num, const char *format, ...)
