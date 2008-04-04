@@ -12,7 +12,8 @@
 static bool rdep_verbose = true;
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed, dep_t *all_deps,
-			dep_t *chain_deps, const char *parent);
+			dep_t *chain_deps, bool optional,
+			const char *parent);
 static void msg_fill(FILE *fd, int num, const char *format, ...);
 
 dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
@@ -29,7 +30,7 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	chain = dep_new();
 
 	/* recurse over needed */
-	success = _recurse_deps(pool, sk, needed, all, chain, NULL);
+	success = _recurse_deps(pool, sk, needed, all, chain, false, NULL);
 
 	dep_free(chain);
 out:
@@ -43,7 +44,8 @@ out:
 
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed, dep_t *all_deps,
-			dep_t *chain_deps, const char *parent)
+			dep_t *chain_deps, bool optional,
+			const char *parent)
 {
 	int n;
 	initd_t *cur;
@@ -60,8 +62,14 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		char *cdep = dep_get_dep((dep_t *)needed, n);
 		cur = initd_list_find_name(pool, cdep);
 		if (!cur) {
-			fprintf(stderr, "No init script named %s\n", cdep);
-			success = false;
+			/* Don't error if the caller said this was an
+			 * optional dependency. */
+			if (!optional) {
+				fprintf(stderr,
+					"No init script named %s\n",
+					cdep);
+				success = false;
+			}
 			goto out;
 		}
 
@@ -95,12 +103,12 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		case RC_START:
 			success = _recurse_deps(pool, sk, cur->rstart,
 						all_deps, chain_deps,
-						cur->name);
+						false, cur->name);
 			break;
 		case RC_STOP:
 			success = _recurse_deps(pool, sk, cur->rstop,
 						all_deps, chain_deps,
-						cur->name);
+						false, cur->name);
 			break;
 		default:
 			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
