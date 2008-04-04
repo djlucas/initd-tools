@@ -16,9 +16,9 @@ extern strarg_t *strarg_new(void);
 extern void strarg_free(strarg_t *sp);
 extern void strarg_add(strarg_t *sp, const char *s);
 extern void strarg_pop(strarg_t *sp);
-extern bool strarg_exists(strarg_t *sp, const char *s);
-extern unsigned int strarg_get_num(strarg_t *sp);
-extern char *strarg_get_str(strarg_t *sp, unsigned int index);
-extern strarg_t *strarg_copy(strarg_t *source);
+extern bool strarg_exists(const strarg_t *sp, const char *s);
+extern unsigned int strarg_get_num(const strarg_t *sp);
+extern char *strarg_get_str(const strarg_t *sp, unsigned int index);
+extern strarg_t *strarg_copy(const strarg_t *source);
 
 #endif /* _str_h_ */

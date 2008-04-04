@@ -75,7 +75,7 @@ void strarg_pop(strarg_t *sp)
 }
 
 /* Find if a given string exists in the strarg array. */
-bool strarg_exists(strarg_t *sp, const char *s)
+bool strarg_exists(const strarg_t *sp, const char *s)
 {
 	int n;
 	bool found = false;
@@ -94,7 +94,7 @@ out:
 	return found;
 }
 
-unsigned int strarg_get_num(strarg_t *sp)
+unsigned int strarg_get_num(const strarg_t *sp)
 {
 	if (sp)
 		return sp->nstr;
@@ -102,7 +102,7 @@ unsigned int strarg_get_num(strarg_t *sp)
 		return 0;
 }
 
-char *strarg_get_str(strarg_t *sp, unsigned int index)
+char *strarg_get_str(const strarg_t *sp, unsigned int index)
 {
 	if (sp && index <= sp->nstr)
 		return sp->str[index];
@@ -111,7 +111,7 @@ char *strarg_get_str(strarg_t *sp, unsigned int index)
 }
 
 
-strarg_t *strarg_copy(strarg_t *source)
+strarg_t *strarg_copy(const strarg_t *source)
 {
 	int n;
 	strarg_t *dest = strarg_new();
