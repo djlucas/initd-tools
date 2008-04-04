@@ -29,6 +29,10 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	all = dep_new();
 	chain = dep_new();
 
+	/* FIXME: If there are other initd's in the pool that should
+	 * start or should stop before any of the needed deps, they
+	 * should also be added to the list. */
+
 	/* recurse over needed */
 	success = _recurse_deps(pool, sk, needed, all, chain, false, NULL);
 
@@ -97,7 +101,7 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		/* add it to the chain */
 		dep_add(chain_deps, cur->name);
 
-		/* process its dependencies */
+		/* process its required dependencies */
 		level++;
 		switch (sk) {
 		case RC_START:
@@ -109,6 +113,28 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			success = _recurse_deps(pool, sk, cur->rstop,
 						all_deps, chain_deps,
 						false, cur->name);
+			break;
+		default:
+			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
+		}
+		level--;
+
+		/* Break from the loop if the recursion was a failure */
+		if (!success)
+			goto out;
+
+		/* process its optional dependencies */
+		level++;
+		switch (sk) {
+		case RC_START:
+			success = _recurse_deps(pool, sk, cur->sstart,
+						all_deps, chain_deps,
+						true, cur->name);
+			break;
+		case RC_STOP:
+			success = _recurse_deps(pool, sk, cur->sstop,
+						all_deps, chain_deps,
+						true, cur->name);
 			break;
 		default:
 			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
