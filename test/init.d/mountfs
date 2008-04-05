@@ -1,0 +1,27 @@
+#!/bin/sh
+# Begin $rc_base/init.d/mountfs
+
+### BEGIN INIT INFO
+# Provides:             $local_fs
+# Default-Start:        1 2 3 4 5
+## Default-Start:        sysinit
+# Default-Stop:         0 6
+# Short-Description:    Mount local file systems
+# Description:          The mountfs script mounts file systems on
+#  locally accessible volumes. This means all non-network file systems.
+### END INIT INFO
+
+case "$1" in
+	start)
+		;;
+
+	stop)
+		;;
+
+	*)
+		echo "Usage: ${0} {start|stop}"
+		exit 1
+		;;
+esac
+
+# End $rc_base/init.d/mountfs

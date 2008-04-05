@@ -1,0 +1,22 @@
+#!/bin/sh
+# /etc/init.d/network
+
+### BEGIN INIT INFO
+# Provides: $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Should-Start: $local_fs
+# Should-Stop: $local_fs
+# Short-Description: Basic networking support
+# Description: The network script enables the initial networking
+#	support. Any network interfaces not requiring authentication can
+#	be expected to be available.
+### END INIT INFO
+
+# Do some other stuff
+case "$1" in
+start)
+	;;
+stop)
+	;;
+esac
