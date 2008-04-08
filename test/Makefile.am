@@ -1,11 +1,11 @@
 INCLUDES = -I$(top_srcdir)/lib
 
+runtestscripts = $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh
 testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
 	init.d/mountfs init.d/network
 
-EXTRA_DIST = $(testscripts)
-TESTS = tstr tstrarg tdep $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh \
-	tinitd tinitd-list
+EXTRA_DIST = $(runtestscripts) $(testscripts)
+TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list
 check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list
 
 tstr_SOURCES = tstr.c
