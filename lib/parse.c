@@ -334,10 +334,8 @@ static void initd_parse_line_tokens(initd_t *ip, const char *line,
 
 		switch(key) {
 		case KEY_DSTART:
-			ip->dstart |= initd_convert_to_rc(tok);
-			break;
 		case KEY_DSTOP:
-			ip->dstop |= initd_convert_to_rc(tok);
+			initd_set_rc(ip, key, initd_convert_to_rc(tok));
 			break;
 		case KEY_PROV:
 			initd_add_prov(ip, tok);

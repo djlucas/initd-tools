@@ -86,6 +86,29 @@ out:
 	return dest;
 }
 
+extern void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level)
+{
+	if (!ip)
+		return;
+
+	switch (key) {
+	case KEY_ASTART:
+		ip->astart |= level;
+		break;
+	case KEY_ASTOP:
+		ip->astop |= level;
+		break;
+	case KEY_DSTART:
+		ip->dstart |= level;
+		break;
+	case KEY_DSTOP:
+		ip->dstop |= level;
+		break;
+	default:
+		break;
+	}
+}
+
 void initd_set_sdesc(initd_t *ip, const char *sdesc)
 {
 	if (!ip)
