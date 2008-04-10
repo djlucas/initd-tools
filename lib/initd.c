@@ -18,6 +18,7 @@ initd_t *initd_new(const char *name) {
 	ip->prov = prov_new();
 
 	ip->dstart = ip->dstop = 0;
+	ip->astart = ip->astop = 0;
 
 	ip->rstart = dep_new();
 	ip->rstop = dep_new();
