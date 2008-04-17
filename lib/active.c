@@ -28,9 +28,12 @@ static void set_active_from_symlink(initd_list_t *ilp,
 					const char *link, const char *tgt);
 
 static struct rcpair rcsdirs[] = {
-	{ "../rcS.d", RC_SI },
-	{ "../rcs.d", RC_SI },
-	{ "../rcsysinit.d", RC_SI },
+	{ "../rcS.d", RC_S },
+	{ "../rcs.d", RC_S },
+	{ "../rcSI.d", RC_S },
+	{ "../rcsi.d", RC_S },
+	{ "../rcSYSINIT.d", RC_S },
+	{ "../rcsysinit.d", RC_S },
 	{ NULL, 0 }
 };
 

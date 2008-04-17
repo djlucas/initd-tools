@@ -26,9 +26,8 @@ tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
 tactive_SOURCES = tactive.c
 tactive_LDADD = $(top_builddir)/lib/libinitd.la
 
-rctestdirs = rc0.d rc1.d rc2.d rc3.d rc4.d rc5.d rc6.d
-testmountfslinks = rc0.d/K90mountfs rc1.d/S10mountfs rc2.d/S10mountfs \
-	rc3.d/S10mountfs rc4.d/S10mountfs rc5.d/S10mountfs rc6.d/K90mountfs
+rctestdirs = rcS.d rc0.d rc1.d rc2.d rc3.d rc4.d rc5.d rc6.d
+testmountfslinks = rcS.d/S10mountfs rc0.d/K90mountfs rc6.d/K90mountfs
 testnetworklinks = rc0.d/K80network rc1.d/K80network rc2.d/S20network \
 	rc3.d/S20network rc4.d/S20network rc5.d/S20network rc6.d/K80network
 

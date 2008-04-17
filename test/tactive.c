@@ -47,8 +47,8 @@ static void print_actives(const initd_list_t *ilp)
 
 static void print_rc_string(const initd_rc_t rc)
 {
-	if (rc & RC_SI)
-		printf(" si");
+	if (rc & RC_S)
+		printf(" S");
 	if (rc & RC_0)
 		printf(" 0");
 	if (rc & RC_1)

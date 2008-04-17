@@ -281,26 +281,50 @@ out:
 static initd_rc_t initd_convert_to_rc(const char *tok)
 {
 	initd_rc_t lev = 0;
+	int ntok;
 
 	if (!tok)
 		goto out;
 
-	if (strcmp(tok, "si") == 0)
-		lev = RC_SI;
-	else if (*tok == '0')
+	/* See if this is a sysinit level */
+	if ((strcasecmp(tok, "s") == 0) ||
+		(strcasecmp(tok, "si") == 0) ||
+		(strcasecmp(tok, "sysinit") == 0)) {
+		lev = RC_S;
+		goto out;
+	}
+
+	/* Otherwise, it must be a numeric level */
+	ntok = atoi(tok);
+
+	/* Validate the numeric level or set it back to 0 */
+	switch (ntok) {
+	case 0:
 		lev = RC_0;
-	else if (*tok == '1')
+		break;
+	case 1:
 		lev = RC_1;
-	else if (*tok == '2')
+		break;
+	case 2:
 		lev = RC_2;
-	else if (*tok == '3')
+		break;
+	case 3:
 		lev = RC_3;
-	else if (*tok == '4')
+		break;
+	case 4:
 		lev = RC_4;
-	else if (*tok == '5')
+		break;
+	case 5:
 		lev = RC_5;
-	else if (*tok == '6')
+		break;
+	case 6:
 		lev = RC_6;
+		break;
+	default:
+		/* Should we warn for invalid token? */
+		break;
+	}
+
 out:
 	return lev;
 }
