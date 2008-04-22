@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	need = dep_new();
 	dep_add(need, "a");
 
+	initd_recurse_set_verbose(true);
 	startlist = initd_recurse_deps(all, RC_START, need);
 	print_sk_list(startlist, RC_START);
 

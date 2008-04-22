@@ -9,7 +9,7 @@
 #include "types.h"
 #include "rdep.h"
 
-static bool rdep_verbose = true;
+static bool rdep_verbose = false;
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed, dep_t *all_deps,
 			dep_t *chain_deps, bool optional,
@@ -44,6 +44,11 @@ out:
 		dep_free(all);
 		return NULL;
 	}
+}
+
+void initd_recurse_set_verbose(bool verbose)
+{
+	rdep_verbose = verbose;
 }
 
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
