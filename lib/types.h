@@ -9,6 +9,8 @@ typedef enum initd_key {
 	KEY_NONE,      /* Empty field */
 	KEY_NAME,      /* Filename of the script */
 	KEY_PROV,      /* Provides */
+	KEY_ASTART,    /* Active Start levels */
+	KEY_ASTOP,     /* Active Stop levels */
 	KEY_DSTART,    /* Default-Start */
 	KEY_DSTOP,     /* Default-Stop */
 	KEY_RSTART,    /* Required-Start */
@@ -46,14 +48,14 @@ typedef strarg_t dep_t;
 
 /* rc type */
 typedef enum initd_rc {
-	RC_SI = (1 << 0),  /* rcsysinit.d */
-	RC_0  = (1 << 1),  /* rc0.d */
-	RC_1  = (1 << 2),  /* rc1.d */
-	RC_2  = (1 << 3),  /* rc2.d */
-	RC_3  = (1 << 4),  /* rc3.d */
-	RC_4  = (1 << 5),  /* rc4.d */
-	RC_5  = (1 << 6),  /* rc5.d */
-	RC_6  = (1 << 7)   /* rc6.d */
+	RC_S = (1 << 0),  /* rcS.d or its variants */
+	RC_0 = (1 << 1),  /* rc0.d */
+	RC_1 = (1 << 2),  /* rc1.d */
+	RC_2 = (1 << 3),  /* rc2.d */
+	RC_3 = (1 << 4),  /* rc3.d */
+	RC_4 = (1 << 5),  /* rc4.d */
+	RC_5 = (1 << 6),  /* rc5.d */
+	RC_6 = (1 << 7)   /* rc6.d */
 } initd_rc_t;
 
 /* start/stop (S/K) type */
@@ -70,6 +72,9 @@ typedef struct initd {
 
 	initd_rc_t dstart;  /* Default-Start */
 	initd_rc_t dstop;   /* Default-Stop */
+
+	initd_rc_t astart;  /* Active Start levels */
+	initd_rc_t astop;   /* Active Stop levels */
 
 	dep_t *rstart;      /* Required-Start */
 	dep_t *rstop;       /* Required-Stop */

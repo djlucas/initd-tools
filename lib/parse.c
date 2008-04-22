@@ -281,26 +281,50 @@ out:
 static initd_rc_t initd_convert_to_rc(const char *tok)
 {
 	initd_rc_t lev = 0;
+	int ntok;
 
 	if (!tok)
 		goto out;
 
-	if (strcmp(tok, "si") == 0)
-		lev = RC_SI;
-	else if (*tok == '0')
+	/* See if this is a numeric level */
+	ntok = atoi(tok);
+
+	/* Validate the numeric level or set it back to 0 */
+	switch (ntok) {
+	case 0:
 		lev = RC_0;
-	else if (*tok == '1')
+		goto out;
+	case 1:
 		lev = RC_1;
-	else if (*tok == '2')
+		goto out;
+	case 2:
 		lev = RC_2;
-	else if (*tok == '3')
+		goto out;
+	case 3:
 		lev = RC_3;
-	else if (*tok == '4')
+		goto out;
+	case 4:
 		lev = RC_4;
-	else if (*tok == '5')
+		goto out;
+	case 5:
 		lev = RC_5;
-	else if (*tok == '6')
+		goto out;
+	case 6:
 		lev = RC_6;
+		goto out;
+	}
+
+	/* See if this is a sysinit level */
+	if ((strcasecmp(tok, "s") == 0) ||
+		(strcasecmp(tok, "si") == 0) ||
+		(strcasecmp(tok, "sysinit") == 0)) {
+		lev = RC_S;
+		goto out;
+	}
+
+	/* Should we warn for invalid token? */
+	/* fprintf(stderr, "Invalid RC token %s\n", tok); */
+
 out:
 	return lev;
 }
@@ -334,10 +358,8 @@ static void initd_parse_line_tokens(initd_t *ip, const char *line,
 
 		switch(key) {
 		case KEY_DSTART:
-			ip->dstart |= initd_convert_to_rc(tok);
-			break;
 		case KEY_DSTOP:
-			ip->dstop |= initd_convert_to_rc(tok);
+			initd_set_rc(ip, key, initd_convert_to_rc(tok));
 			break;
 		case KEY_PROV:
 			initd_add_prov(ip, tok);

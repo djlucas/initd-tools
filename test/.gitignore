@@ -1,4 +1,5 @@
 deps
+tactive
 tstr
 tstrarg
 tdep
@@ -6,3 +7,4 @@ tinitd
 tinitd-list
 tparse
 tparse-dir
+rc?.d

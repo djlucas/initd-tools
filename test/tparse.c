@@ -67,7 +67,7 @@ static void print_initd(initd_t *ip)
 
 static void print_level(initd_rc_t rc)
 {
-	if (rc & RC_SI) printf(" sysinit");
+	if (rc & RC_S) printf(" S");
 	if (rc & RC_0) printf(" 0");
 	if (rc & RC_1) printf(" 1");
 	if (rc & RC_2) printf(" 2");

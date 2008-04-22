@@ -1,11 +1,13 @@
 INCLUDES = -I$(top_srcdir)/lib
 
-testscripts = init.d/bar init.d/foo init.d/barf
+runtestscripts = $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh
+testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
+	init.d/mountfs init.d/network
 
-EXTRA_DIST = $(testscripts)
-TESTS = tstr tstrarg tdep $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh \
-	tinitd tinitd-list
-check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list
+EXTRA_DIST = $(runtestscripts) $(testscripts)
+TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive
+check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list \
+	tactive
 
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
@@ -21,7 +23,42 @@ tinitd_SOURCES = tinitd.c
 tinitd_LDADD = $(top_builddir)/lib/libinitd.la
 tinitd_list_SOURCES = tinitd-list.c
 tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
+tactive_SOURCES = tactive.c
+tactive_LDADD = $(top_builddir)/lib/libinitd.la
 
 noinst_PROGRAMS = deps
 deps_SOURCES = deps.c
 deps_LDADD = $(top_builddir)/lib/libinitd.la
+
+rctestdirs = rcS.d rc0.d rc1.d rc2.d rc3.d rc4.d rc5.d rc6.d
+testmountfslinks = rcS.d/S10mountfs rc0.d/K90mountfs rc6.d/K90mountfs
+testnetworklinks = rc0.d/K80network rc1.d/K80network rc2.d/S20network \
+	rc3.d/S20network rc4.d/S20network rc5.d/S20network rc6.d/K80network
+
+testlinks = $(testmountfslinks) $(testnetworklinks)
+$(TESTS): $(testlinks)
+
+clean-local:
+	-rm -rf $(rctestdirs)
+	-@if test "$(srcdir)" != "$(builddir)"; then \
+	  echo rm -rf init.d; \
+	  rm -rf init.d; \
+	fi
+
+$(testmountfslinks): init.d/mountfs
+	@if test ! -f init.d/mountfs; then \
+	  test -d init.d || mkdir init.d 2>/dev/null || :; \
+	  cp -p $(srcdir)/init.d/mountfs init.d/mountfs; \
+	fi
+	@tdir=`dirname $@`; test -d $$tdir || mkdir $$tdir || :
+	rm -f $@
+	ln -s ../init.d/mountfs $@
+
+$(testnetworklinks): init.d/network
+	@if test ! -f init.d/network; then \
+	  test -d init.d || mkdir init.d 2>/dev/null || :; \
+	  cp -p $(srcdir)/init.d/network init.d/network; \
+	fi
+	@tdir=`dirname $@`; test -d $$tdir || mkdir $$tdir || :
+	rm -f $@
+	ln -s ../init.d/network $@
