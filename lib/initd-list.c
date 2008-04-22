@@ -150,6 +150,24 @@ out:
 	return ip;
 }
 
+/* Return an initd from a list that provides the given service. Returns
+ * NULL when not found. */
+initd_t *initd_list_find_provides(initd_list_t *ilp, const char *serv)
+{
+	initd_t *cur;
+
+	if (!ilp)
+		goto err;
+
+	for (cur = ilp->first; cur; cur = cur->next) {
+		if (initd_provides(cur, serv))
+			return cur;
+	}
+
+err:
+	return NULL;
+}
+
 /* Verify that a given named initd exists in the list. */
 bool initd_list_exists_name(initd_list_t *ilp, const char *name)
 {
@@ -182,21 +200,10 @@ out:
 /* Find whether a given service is provided by any script in the list. */
 bool initd_list_provides(initd_list_t *ilp, const char *serv)
 {
-	bool found = false;
-	initd_t *cur;
-
-	if (!ilp)
-		goto out;
-
-	for (cur = ilp->first; cur; cur = cur->next) {
-		if (initd_provides(cur, serv)) {
-			found = true;
-			break;
-		}
-	}
-
-out:
-	return found;
+	if (initd_list_find_provides(ilp, serv))
+		return true;
+	else
+		return false;
 }
 
 /* Given an initd, verify that all the Required-Start scripts exist in
