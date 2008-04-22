@@ -26,9 +26,9 @@ tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
 tactive_SOURCES = tactive.c
 tactive_LDADD = $(top_builddir)/lib/libinitd.la
 
-noinst_PROGRAMS = deps
-deps_SOURCES = deps.c
-deps_LDADD = $(top_builddir)/lib/libinitd.la
+noinst_PROGRAMS = trdeps
+trdeps_SOURCES = trdeps.c
+trdeps_LDADD = $(top_builddir)/lib/libinitd.la
 
 rctestdirs = rcS.d rc0.d rc1.d rc2.d rc3.d rc4.d rc5.d rc6.d
 testmountfslinks = rcS.d/S10mountfs rc0.d/K90mountfs rc6.d/K90mountfs
