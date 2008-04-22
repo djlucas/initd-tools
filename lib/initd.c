@@ -86,7 +86,7 @@ out:
 	return dest;
 }
 
-extern void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level)
+void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level)
 {
 	if (!ip)
 		return;
