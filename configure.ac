@@ -14,6 +14,18 @@ if test "x$GCC" = xyes; then
 	CFLAGS="$CFLAGS -Wall"
 fi
 
+AC_ARG_ENABLE([werror],
+	[AS_HELP_STRING([--enable-werror],
+	[Error on compiler warnings @<:@default=no@:>@])],,
+	[enable_werror=no]
+)
+
+if test "x$enable_werror" != xno; then
+	if test "x$GCC" = xyes; then
+		CFLAGS="$CFLAGS -Werror"
+	fi
+fi
+
 AC_CONFIG_FILES([
 Makefile
 lib/Makefile
