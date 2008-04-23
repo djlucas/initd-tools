@@ -45,6 +45,8 @@ extern initd_t *initd_list_find_provides(initd_list_t *ilp, const char *serv);
 extern bool initd_list_exists_name(initd_list_t *ilp, const char *name);
 extern bool initd_provides(initd_t *ip, const char *serv);
 extern bool initd_list_provides(initd_list_t *ilp, const char *serv);
+extern bool initd_is_active(const initd_t *ip, initd_rc_t rc,
+				initd_sk_t sk);
 extern char *initd_verify_deps(initd_list_t *ilp, initd_t *ip,
 				initd_key_t key);
 extern char *initd_list_verify_all(initd_list_t *ilp);

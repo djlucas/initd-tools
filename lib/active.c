@@ -79,6 +79,27 @@ void initd_list_set_actives(initd_list_t *ilp, const char *dir)
 	free(cwd);
 }
 
+bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_sk_t sk)
+{
+	if (!ip)
+		return false;
+
+	switch (sk) {
+	case RC_START:
+		if (ip->astart & rc)
+			return true;
+		else
+			return false;
+	case RC_STOP:
+		if (ip->astop & rc)
+			return true;
+		else
+			return false;
+	default:
+		return false;
+	}
+}
+
 static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp)
 {
 	char *dir, *link;
