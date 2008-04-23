@@ -28,6 +28,7 @@ typedef strarg_t prov_t;
 #define prov_new strarg_new
 #define prov_free strarg_free
 #define prov_add strarg_add
+#define prov_push strarg_push
 #define prov_pop strarg_pop
 #define prov_get_num strarg_get_num
 #define prov_get_prov strarg_get_str
@@ -40,6 +41,7 @@ typedef strarg_t dep_t;
 #define dep_new strarg_new
 #define dep_free strarg_free
 #define dep_add strarg_add
+#define dep_push strarg_push
 #define dep_pop strarg_pop
 #define dep_get_num strarg_get_num
 #define dep_get_dep strarg_get_str

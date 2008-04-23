@@ -15,6 +15,7 @@ typedef struct strarg {
 extern strarg_t *strarg_new(void);
 extern void strarg_free(strarg_t *sp);
 extern void strarg_add(strarg_t *sp, const char *s);
+#define strarg_push strarg_add
 extern void strarg_pop(strarg_t *sp);
 extern bool strarg_exists(const strarg_t *sp, const char *s);
 extern unsigned int strarg_get_num(const strarg_t *sp);

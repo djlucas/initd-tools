@@ -33,6 +33,7 @@ extern void initd_add_desc(initd_t *ip, const char *ext);
 extern initd_list_t *initd_list_new(void);
 extern void initd_list_free(initd_list_t *ilp);
 extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
+#define initd_list_push initd_list_add
 extern void initd_list_pop(initd_list_t *ilp);
 extern initd_list_t *initd_list_from_dir(const char *dir);
 extern void initd_list_set_actives(initd_list_t *ilp, const char *dir);
