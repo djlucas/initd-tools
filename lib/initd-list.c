@@ -66,6 +66,25 @@ void initd_list_add(initd_list_t *ilp, initd_t *ip)
 	ilp->last = ip;
 }
 
+/* Remove the last element from an initd list */
+void initd_list_pop(initd_list_t *ilp)
+{
+	initd_t *cur;
+
+	if (!ilp || !ilp->last)
+		return;
+
+	if (ilp->first == ilp->last) {
+		initd_free(ilp->first);
+		ilp->first = ilp->last = NULL;
+	} else {
+		cur = ilp->last->prev;
+		initd_free(cur->next);
+		cur->next = NULL;
+		ilp->last = cur;
+	}
+}
+
 initd_list_t *initd_list_from_dir(const char *dir)
 {
 	initd_list_t *ilp;

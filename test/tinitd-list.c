@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 
 	/* another list, but with the bogus i4 element */
 	il2 = initd_list_copy(il1);
+	initd_list_pop(il2);
 	initd_list_add(il2, i4);
 
 	printf("il1 ");
