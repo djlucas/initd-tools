@@ -60,6 +60,8 @@ typedef enum initd_rc {
 	RC_6 = (1 << 7)   /* rc6.d */
 } initd_rc_t;
 
+#define RC_ALL (RC_S|RC_0|RC_1|RC_2|RC_3|RC_4|RC_5|RC_6)
+
 /* start/stop (S/K) type */
 typedef enum initd_sk {
 	RC_START,  /* S??foo */
