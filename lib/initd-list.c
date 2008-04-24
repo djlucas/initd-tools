@@ -198,26 +198,6 @@ bool initd_list_exists_name(initd_list_t *ilp, const char *name)
 		return false;
 }
 
-/* Find whether a given service is provided by an initd. */
-bool initd_provides(initd_t *ip, const char *serv)
-{
-	bool found = false;
-	int n;
-
-	if (!ip || !ip->prov)
-		goto out;
-
-	for (n = 0; n < prov_get_num(ip->prov); n++) {
-		if (strcmp(serv, prov_get_prov(ip->prov, n)) == 0) {
-			found = true;
-			break;
-		}
-	}
-
-out:
-	return found;
-}
-
 /* Find whether a given service is provided by any script in the list. */
 bool initd_list_provides(initd_list_t *ilp, const char *serv)
 {

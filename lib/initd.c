@@ -144,6 +144,26 @@ void initd_add_desc(initd_t *ip, const char *ext)
 	}
 }
 
+/* Find whether a given service is provided by an initd. */
+bool initd_provides(initd_t *ip, const char *serv)
+{
+	bool found = false;
+	int n;
+
+	if (!ip || !ip->prov)
+		goto out;
+
+	for (n = 0; n < prov_get_num(ip->prov); n++) {
+		if (strcmp(serv, prov_get_prov(ip->prov, n)) == 0) {
+			found = true;
+			break;
+		}
+	}
+
+out:
+	return found;
+}
+
 /* Kludge the name into the provides array in case any scripts want to
  * depend on a service by its name. */
 void initd_add_implicit_prov(initd_t *ip)
