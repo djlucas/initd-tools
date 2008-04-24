@@ -6,13 +6,13 @@
 #include "types.h"
 #include "rdep.h"
 
-static void print_sk_list(const dep_t *list, initd_sk_t sk);
+static void print_sk_list(const initd_list_t *list, initd_sk_t sk);
 
 int main(int argc, char *argv[])
 {
-	initd_list_t *all;
+	initd_list_t *all, *startlist, *stoplist;
 	initd_t *a, *b, *c, *d, *r;
-	dep_t *startlist, *stoplist, *need;
+	dep_t *need;
 
 	a = initd_new("a");
 	initd_add_prov(a, "a");
@@ -61,10 +61,10 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-static void print_sk_list(const dep_t *list, initd_sk_t sk)
+static void print_sk_list(const initd_list_t *list, initd_sk_t sk)
 {
 	char *startstop;
-	int n;
+	initd_t *ip;
 
 	switch (sk) {
 	case RC_START:
@@ -78,13 +78,12 @@ static void print_sk_list(const dep_t *list, initd_sk_t sk)
 	}
 
 	if (list) {
-		printf("%d deps for %s\n", dep_get_num(list), startstop);
+		printf("All deps for %s\n", startstop);
 		printf("Ordered:");
-		for (n = 0; n < dep_get_num(list); n++)
-			printf(" %s", dep_get_dep(list, n));
+		for (ip = list->first; ip; ip = ip->next)
+			printf(" %s", ip->name);
 		printf("\n");
 	} else {
 		printf("%s list is empty\n", startstop);
 	}
-
 }

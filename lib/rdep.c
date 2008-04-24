@@ -11,23 +11,23 @@
 
 static bool rdep_verbose = false;
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
-			const dep_t *needed, dep_t *all_deps,
-			dep_t *chain_deps, bool optional,
+			const dep_t *needed, initd_list_t *all_deps,
+			initd_list_t *chain_deps, bool optional,
 			const char *parent);
 static void msg_fill(FILE *fd, int num, const char *format, ...);
 
-dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
+initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed)
 {
-	dep_t *all = NULL, *chain;
+	initd_list_t *all = NULL, *chain;
 	bool success = false;
 
 	if (!pool || !needed)
 		goto out;
 
-	/* initialize the dep lists */
-	all = dep_new();
-	chain = dep_new();
+	/* initialize the initd lists */
+	all = initd_list_new();
+	chain = initd_list_new();
 
 	/* FIXME: If there are other initd's in the pool that should
 	 * start or should stop before any of the needed deps, they
@@ -36,12 +36,12 @@ dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	/* recurse over needed */
 	success = _recurse_deps(pool, sk, needed, all, chain, false, NULL);
 
-	dep_free(chain);
+	initd_list_free(chain);
 out:
 	if (success) {
 		return all;
 	} else {
-		dep_free(all);
+		initd_list_free(all);
 		return NULL;
 	}
 }
@@ -52,12 +52,13 @@ void initd_recurse_set_verbose(bool verbose)
 }
 
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
-			const dep_t *needed, dep_t *all_deps,
-			dep_t *chain_deps, bool optional,
+			const dep_t *needed, initd_list_t *all_deps,
+			initd_list_t *chain_deps, bool optional,
 			const char *parent)
 {
 	int n;
-	initd_t *cur;
+	char *cstr;
+	initd_t *cip;
 	bool success = true;
 	static int level = 0;
 
@@ -66,58 +67,58 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		goto out;
 	}
 
-	for (n = 0; n < dep_get_num((dep_t *)needed); n++) {
+	for (n = 0; n < dep_get_num(needed); n++) {
 		/* find the initd in pool matching this name */
-		char *cdep = dep_get_dep((dep_t *)needed, n);
-		cur = initd_list_find_name(pool, cdep);
-		if (!cur) {
+		cstr = dep_get_dep(needed, n);
+		cip = initd_list_find_name(pool, cstr);
+		if (!cip) {
 			/* Don't error if the caller said this was an
 			 * optional dependency. */
 			if (!optional) {
 				fprintf(stderr,
 					"No init script named %s\n",
-					cdep);
+					cstr);
 				success = false;
 			}
 			goto out;
 		}
 
 		if (rdep_verbose)
-			msg_fill(stderr, level, "Checking %s\n", cur->name);
+			msg_fill(stderr, level, "Checking %s\n", cip->name);
 
-		/* if this dep is already in all_deps, continue */
-		if (dep_exists(all_deps, cur->name)) {
+		/* if this initd is already in all_deps, continue */
+		if (initd_list_exists_name(all_deps, cip->name)) {
 			if (rdep_verbose)
 				msg_fill(stderr, level, "Pruning %s\n",
-					cur->name);
+					cip->name);
 			continue;
 		}
 
 		/* if this dep is in chain_deps, we have a circular
 		 * dependency */
-		if (dep_exists(chain_deps, cur->name)) {
+		if (initd_list_exists_name(chain_deps, cip->name)) {
 			fprintf(stderr,
 				"Error: circular dependency %s -> %s\n",
-				parent ? parent : "", cur->name);
+				parent ? parent : "", cip->name);
 			success = false;
 			goto out;
 		}
 
 		/* add it to the chain */
-		dep_add(chain_deps, cur->name);
+		initd_list_add(chain_deps, initd_copy(cip));
 
 		/* process its required dependencies */
 		level++;
 		switch (sk) {
 		case RC_START:
-			success = _recurse_deps(pool, sk, cur->rstart,
+			success = _recurse_deps(pool, sk, cip->rstart,
 						all_deps, chain_deps,
-						false, cur->name);
+						false, cip->name);
 			break;
 		case RC_STOP:
-			success = _recurse_deps(pool, sk, cur->rstop,
+			success = _recurse_deps(pool, sk, cip->rstop,
 						all_deps, chain_deps,
-						false, cur->name);
+						false, cip->name);
 			break;
 		default:
 			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
@@ -132,14 +133,14 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		level++;
 		switch (sk) {
 		case RC_START:
-			success = _recurse_deps(pool, sk, cur->sstart,
+			success = _recurse_deps(pool, sk, cip->sstart,
 						all_deps, chain_deps,
-						true, cur->name);
+						true, cip->name);
 			break;
 		case RC_STOP:
-			success = _recurse_deps(pool, sk, cur->sstop,
+			success = _recurse_deps(pool, sk, cip->sstop,
 						all_deps, chain_deps,
-						true, cur->name);
+						true, cip->name);
 			break;
 		default:
 			fprintf(stderr, "Invalid RC start/stop %d\n", sk);
@@ -154,9 +155,9 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		 * Add this dep to all_deps and remove it from
 		 * chain_deps. */
 		if (rdep_verbose)
-			msg_fill(stderr, level, "Adding %s\n", cur->name);
-		dep_add(all_deps, cur->name);
-		dep_pop(chain_deps);
+			msg_fill(stderr, level, "Adding %s\n", cip->name);
+		initd_list_add(all_deps, initd_copy(cip));
+		initd_list_pop(chain_deps);
 	}
 
 out:

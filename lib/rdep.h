@@ -5,7 +5,7 @@
 #include "initd.h"
 #include "types.h"
 
-extern dep_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
+extern initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 				const dep_t *needed);
 extern void initd_recurse_set_verbose(bool verbose);
 
