@@ -10,6 +10,8 @@
 #include "rdep.h"
 
 static bool rdep_verbose = false;
+static dep_t *add_all_active(const initd_list_t *pool,
+			const dep_t *init, initd_sk_t sk);
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed, initd_list_t *all_deps,
 			initd_list_t *chain_deps, bool optional,
@@ -21,6 +23,7 @@ initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 {
 	initd_list_t *all = NULL, *chain;
 	bool success = false;
+	dep_t *all_needed;
 
 	if (!pool || !needed)
 		goto out;
@@ -29,14 +32,16 @@ initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	all = initd_list_new();
 	chain = initd_list_new();
 
-	/* FIXME: If there are other initd's in the pool that should
-	 * start or should stop before any of the needed deps, they
-	 * should also be added to the list. */
+	/* Add all the currently active services to the needed list so
+	 * they are properly reordered. */
+	all_needed = add_all_active(pool, needed, sk);
 
 	/* recurse over needed */
-	success = _recurse_deps(pool, sk, needed, all, chain, false, NULL);
+	success = _recurse_deps(pool, sk, all_needed, all, chain, false,
+				NULL);
 
 	initd_list_free(chain);
+	dep_free(all_needed);
 out:
 	if (success) {
 		return all;
@@ -49,6 +54,24 @@ out:
 void initd_recurse_set_verbose(bool verbose)
 {
 	rdep_verbose = verbose;
+}
+
+static dep_t *add_all_active(const initd_list_t *pool,
+			const dep_t *init, initd_sk_t sk)
+{
+	dep_t *active;
+	initd_t *ip;
+
+	if (!pool)
+		return NULL;
+
+	active = dep_copy(init);
+	for (ip = pool->first; ip; ip = ip->next) {
+		if (initd_is_active(ip, RC_ALL, sk))
+			dep_add(active, ip->name);
+	}
+
+	return active;
 }
 
 static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
