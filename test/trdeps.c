@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
 	c = initd_new("c");
 	initd_add_prov(c, "c");
-	initd_add_sstop(b, "r");
+	initd_add_rstop(b, "$l");
 
 	d = initd_new("d");
 	initd_add_prov(d, "d");
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	initd_add_rstop(d, "c");
 
 	r = initd_new("r");
-	initd_add_prov(r, "r");
+	initd_add_prov(r, "$l");
 	initd_add_rstop(r, "d");
 	initd_add_sstop(r, "q");
 

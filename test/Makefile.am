@@ -5,9 +5,10 @@ testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
 	init.d/mountfs init.d/network
 
 EXTRA_DIST = $(runtestscripts) $(testscripts)
-TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive
+TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive \
+	trdeps
 check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list \
-	tactive
+	tactive trdeps
 
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
@@ -25,8 +26,6 @@ tinitd_list_SOURCES = tinitd-list.c
 tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
 tactive_SOURCES = tactive.c
 tactive_LDADD = $(top_builddir)/lib/libinitd.la
-
-noinst_PROGRAMS = trdeps
 trdeps_SOURCES = trdeps.c
 trdeps_LDADD = $(top_builddir)/lib/libinitd.la
 
