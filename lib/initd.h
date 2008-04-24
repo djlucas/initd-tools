@@ -28,6 +28,7 @@ extern void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level);
 extern void initd_set_sdesc(initd_t *ip, const char *sdesc);
 extern void initd_set_desc(initd_t *ip, const char *desc);
 extern void initd_add_desc(initd_t *ip, const char *ext);
+extern void initd_add_implicit_prov(initd_t *ip);
 
 /* List functions */
 extern initd_list_t *initd_list_new(void);

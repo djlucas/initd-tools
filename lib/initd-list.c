@@ -123,8 +123,10 @@ initd_list_t *initd_list_from_dir(const char *dir)
 #endif /* _DIRENT_HAVE_D_TYPE */
 
 		ip = initd_parse(ip_path);
-		if (ip)
+		if (ip) {
+			initd_add_implicit_prov(ip);
 			initd_list_add(ilp, ip);
+		}
 	}
 
 	/* if errno is set, readdir had issues */

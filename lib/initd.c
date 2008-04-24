@@ -143,3 +143,14 @@ void initd_add_desc(initd_t *ip, const char *ext)
 		ip->desc = d_string_new(ext);
 	}
 }
+
+/* Kludge the name into the provides array in case any scripts want to
+ * depend on a service by its name. */
+void initd_add_implicit_prov(initd_t *ip)
+{
+	if (!ip || !ip->name)
+		return;
+
+	if (!initd_provides(ip, ip->name))
+		initd_add_prov(ip, ip->name);
+}
