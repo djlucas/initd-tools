@@ -52,7 +52,7 @@ void initd_free(initd_t *ip)
 	ip = NULL;
 }
 
-initd_t *initd_copy(initd_t *source)
+initd_t *initd_copy(const initd_t *source)
 {
 	initd_t *dest;
 	char *name;
