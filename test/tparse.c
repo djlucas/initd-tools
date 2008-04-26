@@ -67,12 +67,10 @@ static void print_initd(initd_t *ip)
 
 static void print_level(initd_rc_t rc)
 {
-	if (rc & RC_S) printf(" S");
-	if (rc & RC_0) printf(" 0");
-	if (rc & RC_1) printf(" 1");
-	if (rc & RC_2) printf(" 2");
-	if (rc & RC_3) printf(" 3");
-	if (rc & RC_4) printf(" 4");
-	if (rc & RC_5) printf(" 5");
-	if (rc & RC_6) printf(" 6");
+	initd_rc_t lev;
+
+	for (lev = RC_S; lev <= RC_6; lev = (lev << 1)) {
+		if (rc & lev)
+			printf(" %c", initd_rc_level_char(lev));
+	}
 }

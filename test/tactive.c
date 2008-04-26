@@ -47,21 +47,11 @@ static void print_actives(const initd_list_t *ilp)
 
 static void print_rc_string(const initd_t *ip, initd_sk_t sk)
 {
-	if (initd_is_active(ip, RC_S, sk))
-		printf(" S");
-	if (initd_is_active(ip, RC_0, sk))
-		printf(" 0");
-	if (initd_is_active(ip, RC_1, sk))
-		printf(" 1");
-	if (initd_is_active(ip, RC_2, sk))
-		printf(" 2");
-	if (initd_is_active(ip, RC_3, sk))
-		printf(" 3");
-	if (initd_is_active(ip, RC_4, sk))
-		printf(" 4");
-	if (initd_is_active(ip, RC_5, sk))
-		printf(" 5");
-	if (initd_is_active(ip, RC_6, sk))
-		printf(" 6");
+	initd_rc_t rc;
+
+	for (rc = RC_S; rc <= RC_6; rc = (rc << 1)) {
+		if (initd_is_active(ip, rc, sk))
+			printf(" %c", initd_rc_level_char(rc));
+	}
 	printf("\n");
 }

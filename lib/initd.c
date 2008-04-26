@@ -174,3 +174,37 @@ void initd_add_implicit_prov(initd_t *ip)
 	if (!initd_provides(ip, ip->name))
 		initd_add_prov(ip, ip->name);
 }
+
+char initd_rc_level_char(initd_rc_t rc)
+{
+	char c = '\0';
+
+	switch (rc) {
+	case RC_S:
+		c = 'S';
+		break;
+	case RC_0:
+		c = '0';
+		break;
+	case RC_1:
+		c = '1';
+		break;
+	case RC_2:
+		c = '2';
+		break;
+	case RC_3:
+		c = '3';
+		break;
+	case RC_4:
+		c = '4';
+		break;
+	case RC_5:
+		c = '5';
+		break;
+	case RC_6:
+		c = '6';
+		break;
+	}
+
+	return c;
+}

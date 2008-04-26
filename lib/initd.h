@@ -56,4 +56,7 @@ extern char *initd_verify_deps(const initd_list_t *ilp,
 				const initd_t *ip, initd_key_t key);
 extern char *initd_list_verify_all(const initd_list_t *ilp);
 
+/* Other utility functions */
+extern char initd_rc_level_char(initd_rc_t rc);
+
 #endif /* _initd_h_ */
