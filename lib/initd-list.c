@@ -139,7 +139,7 @@ out:
 	return ilp;
 }
 
-initd_list_t *initd_list_copy(initd_list_t *source)
+initd_list_t *initd_list_copy(const initd_list_t *source)
 {
 	initd_t *iold, *inew;
 	initd_list_t *dest = initd_list_new();
@@ -156,7 +156,7 @@ out:
 	return dest;
 }
 
-initd_t *initd_list_find_name(initd_list_t *ilp, const char *name)
+initd_t *initd_list_find_name(const initd_list_t *ilp, const char *name)
 {
 	initd_t *ip = NULL;
 
@@ -173,7 +173,7 @@ out:
 
 /* Return an initd from a list that provides the given service. Returns
  * NULL when not found. */
-initd_t *initd_list_find_provides(initd_list_t *ilp, const char *serv)
+initd_t *initd_list_find_provides(const initd_list_t *ilp, const char *serv)
 {
 	initd_t *cur;
 
@@ -190,7 +190,7 @@ err:
 }
 
 /* Verify that a given named initd exists in the list. */
-bool initd_list_exists_name(initd_list_t *ilp, const char *name)
+bool initd_list_exists_name(const initd_list_t *ilp, const char *name)
 {
 	if (initd_list_find_name(ilp, name))
 		return true;
@@ -199,7 +199,7 @@ bool initd_list_exists_name(initd_list_t *ilp, const char *name)
 }
 
 /* Find whether a given service is provided by any script in the list. */
-bool initd_list_provides(initd_list_t *ilp, const char *serv)
+bool initd_list_provides(const initd_list_t *ilp, const char *serv)
 {
 	if (initd_list_find_provides(ilp, serv))
 		return true;
@@ -209,7 +209,8 @@ bool initd_list_provides(initd_list_t *ilp, const char *serv)
 
 /* Given an initd, verify that all the Required-Start scripts exist in
  * the supplied list. */
-char *initd_verify_deps(initd_list_t *ilp, initd_t *ip, initd_key_t key)
+char *initd_verify_deps(const initd_list_t *ilp, const initd_t *ip,
+			initd_key_t key)
 {
 	dep_t *type;
 	char *missing = NULL;
@@ -254,7 +255,7 @@ out:
  * list as their own initd. Returns NULL if all the deps have been found
  * or the name of the first missing dep if not.
  */
-char *initd_list_verify_all(initd_list_t *ilp)
+char *initd_list_verify_all(const initd_list_t *ilp)
 {
 	char *missing = NULL;
 	initd_t *cur;

@@ -52,7 +52,7 @@ void initd_free(initd_t *ip)
 	ip = NULL;
 }
 
-initd_t *initd_copy(initd_t *source)
+initd_t *initd_copy(const initd_t *source)
 {
 	initd_t *dest;
 	char *name;
@@ -145,7 +145,7 @@ void initd_add_desc(initd_t *ip, const char *ext)
 }
 
 /* Find whether a given service is provided by an initd. */
-bool initd_provides(initd_t *ip, const char *serv)
+bool initd_provides(const initd_t *ip, const char *serv)
 {
 	bool found = false;
 	int n;

@@ -15,7 +15,7 @@
 
 extern initd_t *initd_new(const char *name);
 extern void initd_free(initd_t *ip);
-extern initd_t *initd_copy(initd_t *source);
+extern initd_t *initd_copy(const initd_t *source);
 extern initd_t *initd_parse(const char *path);
 
 /* Setters */
@@ -38,18 +38,22 @@ extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
 extern void initd_list_pop(initd_list_t *ilp);
 extern initd_list_t *initd_list_from_dir(const char *dir);
 extern void initd_list_set_actives(initd_list_t *ilp, const char *dir);
-extern initd_list_t *initd_list_copy(initd_list_t *source);
-extern initd_t *initd_list_find_name(initd_list_t *ilp, const char *name);
-extern initd_t *initd_list_find_provides(initd_list_t *ilp, const char *serv);
+extern initd_list_t *initd_list_copy(const initd_list_t *source);
+extern initd_t *initd_list_find_name(const initd_list_t *ilp,
+				const char *name);
+extern initd_t *initd_list_find_provides(const initd_list_t *ilp,
+					const char *serv);
 
 /* Verification */
-extern bool initd_list_exists_name(initd_list_t *ilp, const char *name);
-extern bool initd_provides(initd_t *ip, const char *serv);
-extern bool initd_list_provides(initd_list_t *ilp, const char *serv);
+extern bool initd_list_exists_name(const initd_list_t *ilp,
+				const char *name);
+extern bool initd_provides(const initd_t *ip, const char *serv);
+extern bool initd_list_provides(const initd_list_t *ilp,
+				const char *serv);
 extern bool initd_is_active(const initd_t *ip, initd_rc_t rc,
 				initd_sk_t sk);
-extern char *initd_verify_deps(initd_list_t *ilp, initd_t *ip,
-				initd_key_t key);
-extern char *initd_list_verify_all(initd_list_t *ilp);
+extern char *initd_verify_deps(const initd_list_t *ilp,
+				const initd_t *ip, initd_key_t key);
+extern char *initd_list_verify_all(const initd_list_t *ilp);
 
 #endif /* _initd_h_ */
