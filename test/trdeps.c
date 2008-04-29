@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
 
 	a = initd_new("a");
 	initd_add_prov(a, "a");
+	initd_set_rc(a, KEY_DSTART, RC_5);
+	initd_set_rc(a, KEY_DSTOP, (RC_0|RC_1|RC_2|RC_3|RC_4|RC_6));
 	initd_add_rstart(a, "b");
 	initd_add_rstop(a, "b");
 	initd_add_rstart(a, "d");
@@ -23,21 +25,29 @@ int main(int argc, char *argv[])
 
 	b = initd_new("b");
 	initd_add_prov(b, "b");
+	initd_set_rc(b, KEY_DSTART, (RC_3|RC_4|RC_5));
+	initd_set_rc(b, KEY_DSTOP, (RC_0|RC_6));
 	initd_add_rstart(b, "c");
 	initd_add_rstop(b, "c");
 	initd_add_sstart(b, "q");
 
 	c = initd_new("c");
 	initd_add_prov(c, "c");
+	initd_set_rc(c, KEY_DSTART, RC_S);
+	initd_set_rc(c, KEY_DSTOP, (RC_0|RC_6));
 	initd_add_rstop(b, "$l");
 
 	d = initd_new("d");
 	initd_add_prov(d, "d");
+	initd_set_rc(d, KEY_DSTART, RC_5);
+	initd_set_rc(d, KEY_DSTOP, (RC_0|RC_1|RC_2|RC_3|RC_4|RC_6));
 	initd_add_rstart(d, "c");
 	initd_add_rstop(d, "c");
 
 	r = initd_new("r");
 	initd_add_prov(r, "$l");
+	initd_set_rc(r, KEY_DSTART, RC_S);
+	initd_set_rc(r, KEY_DSTOP, (RC_0|RC_6));
 	initd_add_rstop(r, "d");
 	initd_add_sstop(r, "q");
 
@@ -53,10 +63,20 @@ int main(int argc, char *argv[])
 
 	initd_recurse_set_verbose(true);
 	startlist = initd_recurse_deps(all, RC_START, need);
-	print_sk_list(startlist, RC_START);
+	if (startlist) {
+		print_sk_list(startlist, RC_START);
+	} else {
+		fprintf(stderr, "Failed recursing start scripts\n");
+		return 1;
+	}
 
 	stoplist = initd_recurse_deps(all, RC_STOP, need);
-	print_sk_list(stoplist, RC_STOP);
+	if (stoplist) {
+		print_sk_list(stoplist, RC_STOP);
+	} else {
+		fprintf(stderr, "Failed recursing stop scripts\n");
+		return 1;
+	}
 
 	return 0;
 }

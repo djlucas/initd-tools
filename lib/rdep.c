@@ -17,6 +17,9 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			initd_list_t *chain_deps, bool optional,
 			const char *parent);
 static void msg_fill(FILE *fd, int num, const char *format, ...);
+static bool initd_list_verify_level(const initd_list_t *ord,
+				initd_rc_t rc, initd_sk_t sk,
+				bool required);
 
 initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed)
@@ -42,6 +45,15 @@ initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 
 	initd_list_free(chain);
 	dep_free(all_needed);
+
+	if (!success)
+		goto out;
+
+	success = initd_list_verify_deps(all, sk);
+	if (!success)
+		fprintf(stderr, "Failed to verify %s scripts\n",
+			(sk == RC_START) ? "start" : "stop");
+
 out:
 	if (success) {
 		return all;
@@ -54,6 +66,38 @@ out:
 void initd_recurse_set_verbose(bool verbose)
 {
 	rdep_verbose = verbose;
+}
+
+/* Given an ordered initd list (such as determined in initd_recurse_deps)
+ * determine if the start and stop order is valid in each run level. */
+bool initd_list_verify_deps(const initd_list_t *ord, initd_sk_t sk)
+{
+	initd_rc_t rc;
+	bool ret = true;
+
+	if (!ord)
+		return false;
+
+	for (rc = RC_S; rc <= RC_6; rc = rc << 1) {
+		if (!initd_list_verify_level(ord, rc, sk, true)) {
+			fprintf(stderr, "Failed to verify the required "
+				"%s scripts for level %c\n",
+				(sk == RC_START) ? "start" : "stop",
+				initd_rc_level_char(rc));
+			ret = false;
+			break;
+		}
+		if (!initd_list_verify_level(ord, rc, sk, false)) {
+			fprintf(stderr, "Failed to verify the optional "
+				"%s scripts for level %c\n",
+				(sk == RC_START) ? "start" : "stop",
+				initd_rc_level_char(rc));
+			ret = false;
+			break;
+		}
+	}
+
+	return ret;
 }
 
 static dep_t *add_all_active(const initd_list_t *pool,
@@ -237,4 +281,90 @@ static void msg_fill(FILE *fd, int num, const char *format, ...)
 	va_start(args, format);
 	vfprintf(fd, format, args);
 	va_end(args);
+}
+
+static bool initd_list_verify_level(const initd_list_t *ord,
+				initd_rc_t rc, initd_sk_t sk,
+				bool required)
+{
+	initd_t *ip, *dep;
+	initd_rc_t iprc;
+	dep_t *iprcdep;
+	char *dstr;
+	int n;
+	bool match;
+
+	if (!ord)
+		return false;
+
+	/* Check the deps are valid in this level */
+	for (ip = ord->first; ip; ip = ip->next) {
+		if (sk == RC_START) {
+			iprc = ip->dstart;
+			if (required)
+				iprcdep = ip->rstart;
+			else
+				iprcdep = ip->sstart;
+		} else {
+			iprc = ip->dstop;
+			if (required)
+				iprcdep = ip->rstop;
+			else
+				iprcdep = ip->sstop;
+		}
+
+		/* Skip if the script isn't active at this level */
+		if (!(iprc & rc))
+			continue;
+
+		/* Check the deps */
+		for (n = 0; n < dep_get_num(iprcdep); n++) {
+			dstr = dep_get_dep(iprcdep, n);
+			dep = initd_list_find_provides(ord, dstr);
+			if (!dep) {
+				if (required) {
+					fprintf(stderr,
+						"No init script "
+						"provides %s\n",
+						dstr);
+					return false;
+				} else {
+					continue;
+				}
+			}
+
+			/* Check if the dep is started in this level
+			 * or if it's in a special level */
+			if (sk == RC_START) {
+				match = dep->dstart & rc;
+				if (!match)
+					match = dep->dstart & RC_S;
+			} else {
+				match = dep->dstop & rc;
+				if (!match) {
+					match = (dep->dstop & RC_0) &&
+						(dep->dstop & RC_6);
+				}
+			}
+
+			if (!match && sk == RC_START) {
+				fprintf(stderr,
+					"%s dependency %s does not "
+					"start in level %c or sysinit\n",
+					ip->name, dstr,
+					initd_rc_level_char(rc));
+				return false;
+			} else if (!match) {
+				fprintf(stderr,
+					"%s dependency %s does not stop "
+					"in level %c or halt and reboot\n",
+					ip->name, dstr,
+					initd_rc_level_char(rc));
+				return false;
+			}
+		}
+	}
+
+	/* If we get here, then we were successful */
+	return true;
 }
