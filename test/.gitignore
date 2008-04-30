@@ -7,4 +7,5 @@ tinitd-list
 tparse
 tparse-dir
 trdeps
+tverify
 rc?.d
