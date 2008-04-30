@@ -281,37 +281,38 @@ out:
 static initd_rc_t initd_convert_to_rc(const char *tok)
 {
 	initd_rc_t lev = 0;
-	int ntok;
 
 	if (!tok)
 		goto out;
 
 	/* See if this is a numeric level */
-	ntok = atoi(tok);
+	if ((strlen(tok) == 1) && isdigit(*tok)) {
+		int ntok = atoi(tok);
 
-	/* Validate the numeric level or set it back to 0 */
-	switch (ntok) {
-	case 0:
-		lev = RC_0;
-		goto out;
-	case 1:
-		lev = RC_1;
-		goto out;
-	case 2:
-		lev = RC_2;
-		goto out;
-	case 3:
-		lev = RC_3;
-		goto out;
-	case 4:
-		lev = RC_4;
-		goto out;
-	case 5:
-		lev = RC_5;
-		goto out;
-	case 6:
-		lev = RC_6;
-		goto out;
+		/* Validate the numeric level */
+		switch (ntok) {
+		case 0:
+			lev = RC_0;
+			goto out;
+		case 1:
+			lev = RC_1;
+			goto out;
+		case 2:
+			lev = RC_2;
+			goto out;
+		case 3:
+			lev = RC_3;
+			goto out;
+		case 4:
+			lev = RC_4;
+			goto out;
+		case 5:
+			lev = RC_5;
+			goto out;
+		case 6:
+			lev = RC_6;
+			goto out;
+		}
 	}
 
 	/* See if this is a sysinit level */
