@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 	dep_add(need, "a");
 
 	initd_recurse_set_verbose(true);
-	startlist = initd_recurse_deps(all, SK_START, need);
+	startlist = initd_add_recurse_deps(all, SK_START, need);
 	if (startlist) {
 		print_sk_list(startlist, SK_START);
 	} else {
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	stoplist = initd_recurse_deps(all, SK_STOP, need);
+	stoplist = initd_add_recurse_deps(all, SK_STOP, need);
 	if (stoplist) {
 		print_sk_list(stoplist, SK_STOP);
 	} else {

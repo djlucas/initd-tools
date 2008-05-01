@@ -21,7 +21,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				initd_rc_t rc, initd_sk_t sk,
 				bool required);
 
-initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
+initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *needed)
 {
 	initd_list_t *all = NULL, *chain;
@@ -68,7 +68,7 @@ void initd_recurse_set_verbose(bool verbose)
 	rdep_verbose = verbose;
 }
 
-/* Given an ordered initd list (such as determined in initd_recurse_deps)
+/* Given an ordered initd list (such as determined in initd_*_recurse_deps)
  * determine if the start and stop order is valid in each run level. */
 bool initd_list_verify_deps(const initd_list_t *ord, initd_sk_t sk)
 {
