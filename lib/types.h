@@ -62,10 +62,10 @@ typedef enum initd_rc {
 
 #define RC_ALL (RC_S|RC_0|RC_1|RC_2|RC_3|RC_4|RC_5|RC_6)
 
-/* start/stop (S/K) type */
+/* start/kill (S/K) type */
 typedef enum initd_sk {
-	RC_START,  /* S??foo */
-	RC_STOP    /* K??foo */
+	SK_START,  /* S??foo */
+	SK_STOP    /* K??foo */
 } initd_sk_t;
 
 /* The initd type */

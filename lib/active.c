@@ -85,12 +85,12 @@ bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_sk_t sk)
 		return false;
 
 	switch (sk) {
-	case RC_START:
+	case SK_START:
 		if (ip->astart & rc)
 			return true;
 		else
 			return false;
-	case RC_STOP:
+	case SK_STOP:
 		if (ip->astop & rc)
 			return true;
 		else

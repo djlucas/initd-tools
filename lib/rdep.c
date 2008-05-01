@@ -52,7 +52,7 @@ initd_list_t *initd_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	success = initd_list_verify_deps(all, sk);
 	if (!success)
 		fprintf(stderr, "Failed to verify %s scripts\n",
-			(sk == RC_START) ? "start" : "stop");
+			(sk == SK_START) ? "start" : "stop");
 
 out:
 	if (success) {
@@ -82,7 +82,7 @@ bool initd_list_verify_deps(const initd_list_t *ord, initd_sk_t sk)
 		if (!initd_list_verify_level(ord, rc, sk, true)) {
 			fprintf(stderr, "Failed to verify the required "
 				"%s scripts for level %c\n",
-				(sk == RC_START) ? "start" : "stop",
+				(sk == SK_START) ? "start" : "stop",
 				initd_rc_level_char(rc));
 			ret = false;
 			break;
@@ -90,7 +90,7 @@ bool initd_list_verify_deps(const initd_list_t *ord, initd_sk_t sk)
 		if (!initd_list_verify_level(ord, rc, sk, false)) {
 			fprintf(stderr, "Failed to verify the optional "
 				"%s scripts for level %c\n",
-				(sk == RC_START) ? "start" : "stop",
+				(sk == SK_START) ? "start" : "stop",
 				initd_rc_level_char(rc));
 			ret = false;
 			break;
@@ -202,12 +202,12 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		/* process its required dependencies */
 		level++;
 		switch (sk) {
-		case RC_START:
+		case SK_START:
 			success = _recurse_deps(pool, sk, cip->rstart,
 						all_deps, chain_deps,
 						false, cstr);
 			break;
-		case RC_STOP:
+		case SK_STOP:
 			success = _recurse_deps(pool, sk, cip->rstop,
 						all_deps, chain_deps,
 						false, cstr);
@@ -224,12 +224,12 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		/* process its optional dependencies */
 		level++;
 		switch (sk) {
-		case RC_START:
+		case SK_START:
 			success = _recurse_deps(pool, sk, cip->sstart,
 						all_deps, chain_deps,
 						true, cstr);
 			break;
-		case RC_STOP:
+		case SK_STOP:
 			success = _recurse_deps(pool, sk, cip->sstop,
 						all_deps, chain_deps,
 						true, cstr);
@@ -299,7 +299,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 
 	/* Check the deps are valid in this level */
 	for (ip = ord->first; ip; ip = ip->next) {
-		if (sk == RC_START) {
+		if (sk == SK_START) {
 			iprc = ip->dstart;
 			if (required)
 				iprcdep = ip->rstart;
@@ -335,7 +335,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 
 			/* Check if the dep is started in this level
 			 * or if it's in a special level */
-			if (sk == RC_START) {
+			if (sk == SK_START) {
 				match = dep->dstart & rc;
 				if (!match)
 					match = dep->dstart & RC_S;
@@ -347,7 +347,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				}
 			}
 
-			if (!match && sk == RC_START) {
+			if (!match && sk == SK_START) {
 				fprintf(stderr,
 					"%s dependency %s does not "
 					"start in level %c or sysinit\n",

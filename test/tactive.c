@@ -38,10 +38,10 @@ static void print_actives(const initd_list_t *ilp)
 
 	for (ip = ilp->first; ip; ip = ip->next) {
 		printf("%s active start levels:", ip->name);
-		print_rc_string(ip, RC_START);
+		print_rc_string(ip, SK_START);
 
 		printf("%s active stop levels:", ip->name);
-		print_rc_string(ip, RC_STOP);
+		print_rc_string(ip, SK_STOP);
 	}
 }
 
