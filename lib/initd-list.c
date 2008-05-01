@@ -135,6 +135,9 @@ initd_list_t *initd_list_from_dir(const char *dir)
 
 	if (closedir(dfd) != 0)
 		error(2, errno, "%s", dir);
+
+	/* Set the active field for all scripts */
+	initd_list_set_actives(ilp, dir);
 out:
 	return ilp;
 }

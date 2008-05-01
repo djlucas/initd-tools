@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 	}
 
 	all = initd_list_from_dir("init.d");
-	initd_list_set_actives(all, "init.d");
 
 	initd_recurse_set_verbose(true);
 	startlist = initd_recurse_deps(all, RC_START, need);
