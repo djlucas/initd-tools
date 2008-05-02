@@ -73,6 +73,8 @@ initd_t *initd_copy(const initd_t *source)
 
 	dest->dstart = source->dstart;
 	dest->dstop = source->dstop;
+	dest->astart = source->astart;
+	dest->astop = source->astop;
 
 	dest->rstart = dep_copy(source->rstart);
 	dest->rstop = dep_copy(source->rstop);
