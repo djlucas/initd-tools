@@ -6,9 +6,9 @@ testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
 
 EXTRA_DIST = $(runtestscripts) $(testscripts)
 TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive \
-	trdeps tverify
+	trdeps tverify tremove
 check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list \
-	tactive trdeps tverify
+	tactive trdeps tverify tremove
 
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
@@ -30,6 +30,8 @@ trdeps_SOURCES = trdeps.c
 trdeps_LDADD = $(top_builddir)/lib/libinitd.la
 tverify_SOURCES = tverify.c
 tverify_LDADD = $(top_builddir)/lib/libinitd.la
+tremove_SOURCES = tremove.c
+tremove_LDADD = $(top_builddir)/lib/libinitd.la
 
 rctestdirs = rcS.d rc0.d rc1.d rc2.d rc3.d rc4.d rc5.d rc6.d
 testmountfslinks = rcS.d/S10mountfs rc0.d/K90mountfs rc6.d/K90mountfs

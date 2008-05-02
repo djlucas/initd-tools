@@ -8,4 +8,5 @@ tparse
 tparse-dir
 trdeps
 tverify
+tremove
 rc?.d

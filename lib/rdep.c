@@ -21,14 +21,16 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				initd_rc_t rc, initd_sk_t sk,
 				bool required);
 
+/* Given a list of services to add, recurse through their Required and
+ * Should fields to determine an ordered list. */
 initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
-			const dep_t *needed)
+			const dep_t *add)
 {
 	initd_list_t *all = NULL, *chain;
 	bool success = false;
 	dep_t *all_needed;
 
-	if (!pool || !needed)
+	if (!pool || !add)
 		goto out;
 
 	/* initialize the initd lists */
@@ -37,7 +39,7 @@ initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 
 	/* Add all the currently active services to the needed list so
 	 * they are properly reordered. */
-	all_needed = add_all_active(pool, needed, sk);
+	all_needed = add_all_active(pool, add, sk);
 
 	/* recurse over needed */
 	success = _recurse_deps(pool, sk, all_needed, all, chain, false,
@@ -55,6 +57,91 @@ initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			(sk == SK_START) ? "start" : "stop");
 
 out:
+	if (success) {
+		return all;
+	} else {
+		initd_list_free(all);
+		return NULL;
+	}
+}
+
+/* Given a list of services to remove, recurse through the Required and
+ * Should fields of the other active services to determine a valid,
+ * ordered list. */
+initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
+				initd_sk_t sk, const dep_t *remove)
+{
+	initd_list_t *save = NULL, *all = NULL, *chain;
+	initd_t *orig, *copy;
+	int n;
+	bool success = false;
+	dep_t *all_active;
+	char *rm;
+
+	if (!pool || !remove)
+		goto out;
+
+	if (dep_get_num(remove) <= 0)
+		goto out;
+
+	/* initialize the initd save list */
+	save = initd_list_new();
+
+	/* Check that the specified services to remove are in the pool.
+	 * If they are, add them to a saved list so we can clear their
+	 * active field and then restore it afterwards. */
+	for (n = 0; n < dep_get_num(remove); n++) {
+		rm = dep_get_dep(remove, n);
+		orig = initd_list_find_provides(pool, rm);
+		if (!orig) {
+			fprintf(stderr, "No init script provides %s\n",
+				rm);
+			goto out;
+		}
+		if (initd_is_active(orig, RC_ALL, sk)) {
+			copy = initd_copy(orig);
+			initd_list_add(save, copy);
+			orig->astart = orig->astop = 0;
+		}
+	}
+
+	/* Find all the currently active services */
+	all_active = add_all_active(pool, NULL, sk);
+
+	/* initialize the initd recursion lists */
+	all = initd_list_new();
+	chain = initd_list_new();
+
+	/* recurse over needed */
+	success = _recurse_deps(pool, sk, all_active, all, chain, false,
+				NULL);
+
+	initd_list_free(chain);
+	dep_free(all_active);
+
+	if (!success)
+		goto out;
+
+	success = initd_list_verify_deps(all, sk);
+	if (!success) {
+		fprintf(stderr, "Failed to verify %s scripts\n",
+			(sk == SK_START) ? "start" : "stop");
+		goto out;
+	}
+
+	/* Restore the saved active levels */
+	for (copy = save->first; copy; copy = copy->next) {
+		orig = initd_list_find_name(pool, copy->name);
+		if (orig) {
+			orig->astart = copy->astart;
+			orig->astop = copy->astop;
+		} else {
+			fprintf(stderr, "Saved script %s not in "
+				"original pool\n", copy->name);
+		}
+	}
+out:
+	initd_list_free(save);
 	if (success) {
 		return all;
 	} else {
