@@ -80,6 +80,9 @@ typedef struct initd {
 	initd_rc_t astart;  /* Active Start levels */
 	initd_rc_t astop;   /* Active Stop levels */
 
+	strarg_t *astart_links;  /* Active Start links */
+	strarg_t *astop_links;   /* Active Stop links */
+
 	dep_t *rstart;      /* Required-Start */
 	dep_t *rstop;       /* Required-Stop */
 

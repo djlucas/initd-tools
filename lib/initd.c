@@ -20,6 +20,9 @@ initd_t *initd_new(const char *name) {
 	ip->dstart = ip->dstop = 0;
 	ip->astart = ip->astop = 0;
 
+	ip->astart_links = strarg_new();
+	ip->astop_links = strarg_new();
+
 	ip->rstart = dep_new();
 	ip->rstop = dep_new();
 	ip->sstart = dep_new();
@@ -40,6 +43,9 @@ void initd_free(initd_t *ip)
 	dep_free(ip->rstop);
 	dep_free(ip->sstart);
 	dep_free(ip->sstop);
+
+	strarg_free(ip->astart_links);
+	strarg_free(ip->astop_links);
 
 	d_string_free(ip->sdesc);
 	d_string_free(ip->desc);
@@ -75,6 +81,9 @@ initd_t *initd_copy(const initd_t *source)
 	dest->dstop = source->dstop;
 	dest->astart = source->astart;
 	dest->astop = source->astop;
+
+	dest->astart_links = strarg_copy(source->astart_links);
+	dest->astop_links = strarg_copy(source->astop_links);
 
 	dest->rstart = dep_copy(source->rstart);
 	dest->rstop = dep_copy(source->rstop);
