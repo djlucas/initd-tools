@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 static void print_actives(const initd_list_t *ilp)
 {
 	initd_t *ip;
+	int n, nstr;
 
 	if (!ilp)
 		return;
@@ -40,8 +41,24 @@ static void print_actives(const initd_list_t *ilp)
 		printf("%s active start levels:", ip->name);
 		print_rc_string(ip, SK_START);
 
+		nstr = ip->astart_links->nstr;
+		if (nstr > 0) {
+			printf("%s active start links:", ip->name);
+			for (n = 0; n < nstr; n++)
+				printf(" %s", ip->astart_links->str[n]);
+			printf("\n");
+		}
+
 		printf("%s active stop levels:", ip->name);
 		print_rc_string(ip, SK_STOP);
+
+		nstr = ip->astop_links->nstr;
+		if (nstr > 0) {
+			printf("%s active stop links:", ip->name);
+			for (n = 0; n < nstr; n++)
+				printf(" %s", ip->astop_links->str[n]);
+			printf("\n");
+		}
 	}
 }
 

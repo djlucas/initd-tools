@@ -26,6 +26,8 @@ static char *rel_readlink(const char *path);
 static void set_active_from_symlink(initd_list_t *ilp,
 					const struct rcpair *rcp,
 					const char *link, const char *tgt);
+static void add_active_link(const initd_t *ip, const char *link,
+			const struct rcpair *rcp, initd_key_t key);
 
 static struct rcpair rcsdirs[] = {
 	{ "../rcS.d", RC_S },
@@ -236,4 +238,39 @@ static void set_active_from_symlink(initd_list_t *ilp,
 
 	/* set this level as active in the initd_t */
 	initd_set_rc(ip, key, rcp->rc);
+
+	/* add the link to the active list */
+	add_active_link(ip, link, rcp, key);
+}
+
+static void add_active_link(const initd_t *ip, const char *link,
+			const struct rcpair *rcp, initd_key_t key)
+{
+	char *fullpath;
+	size_t pathlen;
+
+	if (!(ip || link || rcp))
+		return;
+
+	/* Construct link path relative to init.d directory. This is
+	 * rcp->dir + / + link */
+	pathlen = strlen(rcp->dir) + strlen(link) + 2;
+	fullpath = malloc(sizeof(char) * pathlen);
+	if (!fullpath)
+		error(2, errno, "malloc");
+	if (snprintf(fullpath, pathlen, "%s/%s", rcp->dir, link) >= pathlen)
+		error(2, errno, "snprintf");
+
+	switch (key) {
+	case KEY_ASTART:
+		if (!strarg_exists(ip->astart_links, fullpath))
+			initd_add_astart_links(ip, fullpath);
+		break;
+	case KEY_ASTOP:
+		if (!strarg_exists(ip->astop_links, fullpath))
+			initd_add_astop_links(ip, fullpath);
+		break;
+	default:
+		free(fullpath);
+	}
 }
