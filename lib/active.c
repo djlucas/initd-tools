@@ -14,11 +14,7 @@
 #include <string.h>
 #include "initd.h"
 #include "str.h"
-
-struct rcpair {
-	char *dir;
-	initd_rc_t rc;
-};
+#include "rcint.h"
 
 static bool active_verbose = false;
 static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp);
@@ -28,27 +24,6 @@ static void set_active_from_symlink(initd_list_t *ilp,
 					const char *link, const char *tgt);
 static void add_active_link(const initd_t *ip, const char *link,
 			const struct rcpair *rcp, initd_key_t key);
-
-static struct rcpair rcsdirs[] = {
-	{ "../rcS.d", RC_S },
-	{ "../rcs.d", RC_S },
-	{ "../rcSI.d", RC_S },
-	{ "../rcsi.d", RC_S },
-	{ "../rcSYSINIT.d", RC_S },
-	{ "../rcsysinit.d", RC_S },
-	{ NULL, 0 }
-};
-
-static struct rcpair rcdirs[] = {
-	{ "../rc0.d", RC_0 },
-	{ "../rc1.d", RC_1 },
-	{ "../rc2.d", RC_2 },
-	{ "../rc3.d", RC_3 },
-	{ "../rc4.d", RC_4 },
-	{ "../rc5.d", RC_5 },
-	{ "../rc6.d", RC_6 },
-	{ NULL, 0 }
-};
 
 void initd_list_set_actives(initd_list_t *ilp, const char *dir)
 {
