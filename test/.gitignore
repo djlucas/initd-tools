@@ -9,4 +9,5 @@ tparse-dir
 trdeps
 tverify
 tremove
+tinstall
 rc?.d
