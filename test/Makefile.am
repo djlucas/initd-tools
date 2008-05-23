@@ -6,9 +6,9 @@ testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
 
 EXTRA_DIST = $(runtestscripts) $(testscripts)
 TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive \
-	trdeps tverify tremove tinstall
+	tadd-deps1 tadd-deps2 trem-deps tinstall
 check_PROGRAMS = tstr tstrarg tdep tparse tparse-dir tinitd tinitd-list \
-	tactive trdeps tverify tremove tinstall
+	tactive tadd-deps1 tadd-deps2 trem-deps tinstall
 
 tstr_SOURCES = tstr.c
 tstr_LDADD = $(top_builddir)/lib/libinitd.la
@@ -26,12 +26,12 @@ tinitd_list_SOURCES = tinitd-list.c
 tinitd_list_LDADD = $(top_builddir)/lib/libinitd.la
 tactive_SOURCES = tactive.c
 tactive_LDADD = $(top_builddir)/lib/libinitd.la
-trdeps_SOURCES = trdeps.c
-trdeps_LDADD = $(top_builddir)/lib/libinitd.la
-tverify_SOURCES = tverify.c
-tverify_LDADD = $(top_builddir)/lib/libinitd.la
-tremove_SOURCES = tremove.c
-tremove_LDADD = $(top_builddir)/lib/libinitd.la
+tadd_deps1_SOURCES = tadd-deps1.c
+tadd_deps1_LDADD = $(top_builddir)/lib/libinitd.la
+tadd_deps2_SOURCES = tadd-deps2.c
+tadd_deps2_LDADD = $(top_builddir)/lib/libinitd.la
+trem_deps_SOURCES = trem-deps.c
+trem_deps_LDADD = $(top_builddir)/lib/libinitd.la
 tinstall_SOURCES = tinstall.c
 tinstall_LDADD = $(top_builddir)/lib/libinitd.la
 

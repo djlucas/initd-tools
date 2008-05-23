@@ -6,8 +6,8 @@ tinitd
 tinitd-list
 tparse
 tparse-dir
-trdeps
-tverify
-tremove
+tadd-deps1
+tadd-deps2
+trem-deps
 tinstall
 rc?.d
