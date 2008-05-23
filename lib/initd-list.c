@@ -33,6 +33,9 @@ void initd_list_free(initd_list_t *ilp)
 {
 	initd_t *cur, *nxt;
 
+	if (!ilp)
+		return;
+
 	/* free the members of the initd list */
 	for (cur = ilp->first; cur; cur = nxt) {
 		nxt = cur->next;
