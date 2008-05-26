@@ -60,7 +60,7 @@ static void print_sk_list(const initd_list_t *list, initd_sk_t sk)
 		startstop = "";
 	}
 
-	if (list) {
+	if (list && list->first) {
 		printf("All deps for %s\n", startstop);
 		printf("Ordered:");
 		for (ip = list->first; ip; ip = ip->next)

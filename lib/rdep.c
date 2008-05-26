@@ -22,19 +22,25 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				bool required);
 
 /* Given a list of services to add, recurse through their Required and
- * Should fields to determine an ordered list. */
+ * Should fields to determine an ordered list. NULL is returned on
+ * errors. */
 initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 			const dep_t *add)
 {
-	initd_list_t *all = NULL, *chain;
-	bool success = false;
-	dep_t *all_needed;
+	initd_list_t *all = NULL, *chain = NULL;
+	dep_t *all_needed = NULL;
 
-	if (!pool || !add)
+	if (!pool)
 		goto out;
 
-	/* initialize the initd lists */
+	/* initialize the returned initd list */
 	all = initd_list_new();
+
+	/* just return an empty list if no deps were passed */
+	if (!add || !dep_get_num(add))
+		goto out;
+
+	/* initialize the chain list */
 	chain = initd_list_new();
 
 	/* Add all the currently active services to the needed list so
@@ -42,46 +48,44 @@ initd_list_t *initd_add_recurse_deps(initd_list_t *pool, initd_sk_t sk,
 	all_needed = add_all_active(pool, add, sk);
 
 	/* recurse over needed */
-	success = _recurse_deps(pool, sk, all_needed, all, chain, false,
-				NULL);
+	if (!_recurse_deps(pool, sk, all_needed, all, chain, false, NULL))
+		goto err;
 
-	initd_list_free(chain);
-	dep_free(all_needed);
-
-	if (!success)
+	if (initd_list_verify_deps(all, sk))
 		goto out;
-
-	success = initd_list_verify_deps(all, sk);
-	if (!success)
+	else
 		fprintf(stderr, "Failed to verify %s scripts\n",
 			(sk == SK_START) ? "start" : "stop");
 
+err:
+	initd_list_free(all);
+	all = NULL;
 out:
-	if (success) {
-		return all;
-	} else {
-		initd_list_free(all);
-		return NULL;
-	}
+	initd_list_free(chain);
+	dep_free(all_needed);
+	return all;
 }
 
 /* Given a list of services to remove, recurse through the Required and
  * Should fields of the other active services to determine a valid,
- * ordered list. */
+ * ordered list. Returns NULL on error. */
 initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 				initd_sk_t sk, const dep_t *remove)
 {
-	initd_list_t *save = NULL, *all = NULL, *chain;
+	initd_list_t *save = NULL, *all = NULL, *chain = NULL;
 	initd_t *orig, *copy;
 	int n;
-	bool success = false;
-	dep_t *all_active;
+	dep_t *all_active = NULL;
 	char *rm;
 
-	if (!pool || !remove)
+	if (!pool)
 		goto out;
 
-	if (dep_get_num(remove) <= 0)
+	/* initialize the returned initd list */
+	all = initd_list_new();
+
+	/* just return an empty list if no deps were passed */
+	if (!remove || !dep_get_num(remove))
 		goto out;
 
 	/* initialize the initd save list */
@@ -96,7 +100,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		if (!orig) {
 			fprintf(stderr, "No init script provides %s\n",
 				rm);
-			goto out;
+			goto err;
 		}
 		if (initd_is_active(orig, RC_ALL, sk)) {
 			copy = initd_copy(orig);
@@ -105,28 +109,25 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		}
 	}
 
+	/* If none of the specified services are currently active, the
+	 * save list will be empty and we can just return. */
+	if (!save->first)
+		goto out;
+
 	/* Find all the currently active services */
 	all_active = add_all_active(pool, NULL, sk);
 
-	/* initialize the initd recursion lists */
-	all = initd_list_new();
+	/* initialize the chain recursion lists */
 	chain = initd_list_new();
 
 	/* recurse over needed */
-	success = _recurse_deps(pool, sk, all_active, all, chain, false,
-				NULL);
+	if (!_recurse_deps(pool, sk, all_active, all, chain, false, NULL))
+		goto err;
 
-	initd_list_free(chain);
-	dep_free(all_active);
-
-	if (!success)
-		goto out;
-
-	success = initd_list_verify_deps(all, sk);
-	if (!success) {
+	if (!initd_list_verify_deps(all, sk)) {
 		fprintf(stderr, "Failed to verify %s scripts\n",
 			(sk == SK_START) ? "start" : "stop");
-		goto out;
+		goto err;
 	}
 
 	/* Restore the saved active levels */
@@ -140,14 +141,17 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 				"original pool\n", copy->name);
 		}
 	}
+
+	/* If we got here, we're successful */
+	goto out;
+err:
+	initd_list_free(all);
+	all = NULL;
 out:
+	initd_list_free(chain);
+	dep_free(all_active);
 	initd_list_free(save);
-	if (success) {
-		return all;
-	} else {
-		initd_list_free(all);
-		return NULL;
-	}
+	return all;
 }
 
 void initd_recurse_set_verbose(bool verbose)
