@@ -77,6 +77,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 	int n;
 	dep_t *all_active = NULL;
 	char *rm;
+	initd_key_t key;
 
 	if (!pool)
 		goto out;
@@ -91,6 +92,11 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 	/* initialize the initd save list */
 	save = initd_list_new();
 
+	if (sk == SK_START)
+		key = KEY_ASTART;
+	else
+		key = KEY_ASTOP;
+
 	/* Check that the specified services to remove are in the pool.
 	 * If they are, add them to a saved list so we can clear their
 	 * active field and then restore it afterwards. */
@@ -102,7 +108,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 				rm);
 			goto err;
 		}
-		if (initd_is_active(orig, RC_ALL, sk)) {
+		if (initd_is_active(orig, RC_ALL, key)) {
 			copy = initd_copy(orig);
 			initd_list_add(save, copy);
 			orig->astart = orig->astop = 0;
@@ -196,13 +202,15 @@ static dep_t *add_all_active(const initd_list_t *pool,
 {
 	dep_t *active;
 	initd_t *ip;
+	initd_key_t key;
 
 	if (!pool)
 		return NULL;
 
 	active = dep_copy(init);
+	key = (sk == SK_START) ? KEY_ASTART : KEY_ASTOP;
 	for (ip = pool->first; ip; ip = ip->next) {
-		if (initd_is_active(ip, RC_ALL, sk))
+		if (initd_is_active(ip, RC_ALL, key))
 			dep_add(active, ip->name);
 	}
 

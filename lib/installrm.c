@@ -104,7 +104,7 @@ static void install_level_links(const initd_list_t *ilp,
 	if (sk == SK_START) {
 		for (ip = ilp->first; ip; ip = ip->next) {
 			/* skip script if not active in this level */
-			if (!initd_is_active(ip, rc, sk))
+			if (!initd_is_active(ip, rc, KEY_ASTART))
 				continue;
 
 			remove_existing_link(ip, dir, sk);
@@ -112,7 +112,7 @@ static void install_level_links(const initd_list_t *ilp,
 	} else {
 		for (ip = ilp->last; ip; ip = ip->prev) {
 			/* skip script if not active in this level */
-			if (!initd_is_active(ip, rc, sk))
+			if (!initd_is_active(ip, rc, KEY_ASTOP))
 				continue;
 
 			remove_existing_link(ip, dir, sk);

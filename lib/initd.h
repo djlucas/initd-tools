@@ -53,7 +53,7 @@ extern bool initd_provides(const initd_t *ip, const char *serv);
 extern bool initd_list_provides(const initd_list_t *ilp,
 				const char *serv);
 extern bool initd_is_active(const initd_t *ip, initd_rc_t rc,
-				initd_sk_t sk);
+				initd_key_t key);
 extern char *initd_verify_deps(const initd_list_t *ilp,
 				const initd_t *ip, initd_key_t key);
 extern char *initd_list_verify_all(const initd_list_t *ilp);

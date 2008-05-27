@@ -56,25 +56,29 @@ void initd_list_set_actives(initd_list_t *ilp, const char *dir)
 	free(cwd);
 }
 
-bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_sk_t sk)
+bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_key_t key)
 {
+	initd_rc_t match;
+
 	if (!ip)
 		return false;
 
-	switch (sk) {
-	case SK_START:
-		if (ip->astart & rc)
-			return true;
-		else
-			return false;
-	case SK_STOP:
-		if (ip->astop & rc)
-			return true;
-		else
-			return false;
+	switch (key) {
+	case KEY_ASTART:
+		match = ip->astart;
+		break;
+	case KEY_ASTOP:
+		match = ip->astop;
+		break;
 	default:
+		/* Wrong key type */
 		return false;
 	}
+
+	if (match & rc)
+		return true;
+	else
+		return false;
 }
 
 static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp)
