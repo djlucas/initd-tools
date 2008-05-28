@@ -8,6 +8,9 @@
 #include "initd.h"
 #include "str.h"
 
+static initd_rc_t *initd_get_rc_from_key(const initd_t *ip,
+					initd_key_t key);
+
 initd_t *initd_new(const char *name) {
 	initd_t *ip = malloc(sizeof(initd_t));
 	if (!ip)
@@ -100,32 +103,60 @@ out:
 	return dest;
 }
 
-void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level)
+/* Set the bits of the rc mask in the specified key */
+void initd_set_rc(const initd_t *ip, initd_key_t key, initd_rc_t level)
 {
+	initd_rc_t *rc;
+
 	if (!ip)
 		return;
 
+	rc = initd_get_rc_from_key(ip, key);
+	if (!rc)
+		return;
+
+	/* Set the level bits */
+	*rc |= level;
+}
+
+/* Clear the bits of the rc mask in the specified key */
+void initd_clear_rc(const initd_t *ip, initd_key_t key, initd_rc_t level)
+{
+	initd_rc_t *rc;
+
+	if (!ip)
+		return;
+
+	rc = initd_get_rc_from_key(ip, key);
+	if (!rc)
+		return;
+
+	/* Clear the level bits */
+	*rc &= ~(level);
+}
+
+/* Map a key type to an rc type for an initd_t */
+static initd_rc_t *initd_get_rc_from_key(const initd_t *ip,
+					initd_key_t key)
+{
+	if (!ip)
+		return NULL;
+
 	switch (key) {
 	case KEY_ASTART:
-		ip->astart |= level;
-		break;
+		return (initd_rc_t *) &ip->astart;
 	case KEY_ASTOP:
-		ip->astop |= level;
-		break;
+		return (initd_rc_t *) &ip->astop;
 	case KEY_CSTART:
-		ip->cstart |= level;
-		break;
+		return (initd_rc_t *) &ip->cstart;
 	case KEY_CSTOP:
-		ip->cstop |= level;
-		break;
+		return (initd_rc_t *) &ip->cstop;
 	case KEY_DSTART:
-		ip->dstart |= level;
-		break;
+		return (initd_rc_t *) &ip->dstart;
 	case KEY_DSTOP:
-		ip->dstop |= level;
-		break;
+		return (initd_rc_t *) &ip->dstop;
 	default:
-		break;
+		return NULL;
 	}
 }
 

@@ -26,7 +26,10 @@ extern initd_t *initd_parse(const char *path);
 #define initd_add_sstop(ip, name) dep_add(ip->sstop, name)
 #define initd_add_astart_links(ip, name) strarg_add(ip->astart_links, name)
 #define initd_add_astop_links(ip, name) strarg_add(ip->astop_links, name)
-extern void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level);
+extern void initd_set_rc(const initd_t *ip, initd_key_t key,
+			initd_rc_t level);
+extern void initd_clear_rc(const initd_t *ip, initd_key_t key,
+			initd_rc_t level);
 extern void initd_set_sdesc(initd_t *ip, const char *sdesc);
 extern void initd_set_desc(initd_t *ip, const char *desc);
 extern void initd_add_desc(initd_t *ip, const char *ext);
