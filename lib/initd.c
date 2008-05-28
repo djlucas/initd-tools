@@ -19,6 +19,7 @@ initd_t *initd_new(const char *name) {
 
 	ip->dstart = ip->dstop = 0;
 	ip->astart = ip->astop = 0;
+	ip->cstart = ip->cstop = 0;
 
 	ip->astart_links = strarg_new();
 	ip->astop_links = strarg_new();
@@ -81,6 +82,8 @@ initd_t *initd_copy(const initd_t *source)
 	dest->dstop = source->dstop;
 	dest->astart = source->astart;
 	dest->astop = source->astop;
+	dest->cstart = source->cstart;
+	dest->cstop = source->cstop;
 
 	dest->astart_links = strarg_copy(source->astart_links);
 	dest->astop_links = strarg_copy(source->astop_links);
@@ -108,6 +111,12 @@ void initd_set_rc(initd_t *ip, initd_key_t key, initd_rc_t level)
 		break;
 	case KEY_ASTOP:
 		ip->astop |= level;
+		break;
+	case KEY_CSTART:
+		ip->cstart |= level;
+		break;
+	case KEY_CSTOP:
+		ip->cstop |= level;
 		break;
 	case KEY_DSTART:
 		ip->dstart |= level;

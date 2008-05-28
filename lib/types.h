@@ -11,6 +11,8 @@ typedef enum initd_key {
 	KEY_PROV,      /* Provides */
 	KEY_ASTART,    /* Active Start levels */
 	KEY_ASTOP,     /* Active Stop levels */
+	KEY_CSTART,    /* Changed Start levels */
+	KEY_CSTOP,     /* Changed Stop levels */
 	KEY_DSTART,    /* Default-Start */
 	KEY_DSTOP,     /* Default-Stop */
 	KEY_RSTART,    /* Required-Start */
@@ -79,6 +81,9 @@ typedef struct initd {
 
 	initd_rc_t astart;  /* Active Start levels */
 	initd_rc_t astop;   /* Active Stop levels */
+
+	initd_rc_t cstart;  /* Changed Start levels */
+	initd_rc_t cstop;   /* Changed Stop levels */
 
 	strarg_t *astart_links;  /* Active Start links */
 	strarg_t *astop_links;   /* Active Stop links */
