@@ -14,8 +14,11 @@ int main(int argc, char *argv[])
 	initd_list_t *all, *startlist, *stoplist;
 	dep_t *rem = dep_new();
 
-	if (argc <= 1)
+	if (argc <= 1) {
 		dep_add(rem, "network");
+		dep_add(rem, "bar");
+		dep_add(rem, "foo");
+	}
 
 	while (argc > 1) {
 		dep_add(rem, argv[1]);

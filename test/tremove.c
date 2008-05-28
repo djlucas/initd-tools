@@ -14,8 +14,10 @@ int main(int argc, char *argv[])
 	initd_list_t *all, *startlist, *stoplist;
 	dep_t *rem = dep_new();
 
-	if (argc <= 1)
-		dep_add(rem, "mountfs");
+	if (argc <= 1) {
+		dep_add(rem, "foo");
+		dep_add(rem, "bar");
+	}
 
 	while (argc > 1) {
 		dep_add(rem, argv[1]);

@@ -72,12 +72,11 @@ out:
 initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 				initd_sk_t sk, const dep_t *remove)
 {
-	initd_list_t *save = NULL, *all = NULL, *chain = NULL;
-	initd_t *orig, *copy;
+	initd_list_t *rmlist = NULL, *all = NULL, *chain = NULL;
+	initd_t *ip;
 	int n;
 	dep_t *all_active = NULL;
 	char *rm;
-	initd_key_t key;
 
 	if (!pool)
 		goto out;
@@ -89,35 +88,38 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 	if (!remove || !dep_get_num(remove))
 		goto out;
 
-	/* initialize the initd save list */
-	save = initd_list_new();
-
-	if (sk == SK_START)
-		key = KEY_ASTART;
-	else
-		key = KEY_ASTOP;
+	/* initialize the initd remove list */
+	rmlist = initd_list_new();
 
 	/* Check that the specified services to remove are in the pool.
-	 * If they are, add them to a saved list so we can clear their
-	 * active field and then restore it afterwards. */
+	 * If they are, clear their changed bits to mark them for
+	 * removal. */
 	for (n = 0; n < dep_get_num(remove); n++) {
 		rm = dep_get_dep(remove, n);
-		orig = initd_list_find_provides(pool, rm);
-		if (!orig) {
+		ip = initd_list_find_provides(pool, rm);
+		if (!ip) {
 			fprintf(stderr, "No init script provides %s\n",
 				rm);
 			goto err;
 		}
-		if (initd_is_active(orig, RC_ALL, key)) {
-			copy = initd_copy(orig);
-			initd_list_add(save, copy);
-			orig->astart = orig->astop = 0;
-		}
+
+		/* continue if already in the rmlist */
+		if (initd_list_exists_name(rmlist, ip->name))
+			continue;
+
+		/* Clear the change field to mark for removal */
+		if (sk == SK_START)
+			ip->cstart = 0;
+		else
+			ip->cstop = 0;
+
+		/* Add the initd_t to the rmlist */
+		initd_list_add(rmlist, initd_copy(ip));
 	}
 
 	/* If none of the specified services are currently active, the
-	 * save list will be empty and we can just return. */
-	if (!save->first)
+	 * rm list will be empty and we can just return. */
+	if (!rmlist->first)
 		goto out;
 
 	/* Find all the currently active services */
@@ -136,18 +138,6 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		goto err;
 	}
 
-	/* Restore the saved active levels */
-	for (copy = save->first; copy; copy = copy->next) {
-		orig = initd_list_find_name(pool, copy->name);
-		if (orig) {
-			orig->astart = copy->astart;
-			orig->astop = copy->astop;
-		} else {
-			fprintf(stderr, "Saved script %s not in "
-				"original pool\n", copy->name);
-		}
-	}
-
 	/* If we got here, we're successful */
 	goto out;
 err:
@@ -156,7 +146,7 @@ err:
 out:
 	initd_list_free(chain);
 	dep_free(all_active);
-	initd_list_free(save);
+	initd_list_free(rmlist);
 	return all;
 }
 
@@ -202,15 +192,25 @@ static dep_t *add_all_active(const initd_list_t *pool,
 {
 	dep_t *active;
 	initd_t *ip;
-	initd_key_t key;
+	initd_key_t key, ckey;
 
 	if (!pool)
 		return NULL;
 
 	active = dep_copy(init);
-	key = (sk == SK_START) ? KEY_ASTART : KEY_ASTOP;
+	if (sk == SK_START) {
+		key = KEY_ASTART;
+		ckey = KEY_CSTART;
+	} else {
+		key = KEY_ASTOP;
+		ckey = KEY_CSTOP;
+	}
+
 	for (ip = pool->first; ip; ip = ip->next) {
-		if (initd_is_active(ip, RC_ALL, key))
+		/* Add services if they are active on any level and
+		 * they are not marked for removal on all levels */
+		if (initd_is_active(ip, RC_ALL, key) &&
+			initd_is_active(ip, RC_ALL, ckey))
 			dep_add(active, ip->name);
 	}
 
@@ -392,6 +392,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 	char *dstr;
 	int n;
 	bool match;
+	initd_key_t ckey;
 
 	if (!ord)
 		return false;
@@ -423,7 +424,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 			if (!dep) {
 				if (required) {
 					fprintf(stderr,
-						"No init script "
+						"Error: No init script "
 						"provides %s\n",
 						dstr);
 					return false;
@@ -448,21 +449,46 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 
 			if (!match && sk == SK_START) {
 				fprintf(stderr,
-					"%s dependency %s does not "
-					"start in level %c or sysinit\n",
+					"Error: %s dependency %s does "
+					"not start in level %c or "
+					"sysinit\n",
 					ip->name, dstr,
 					initd_rc_level_char(rc));
 				return false;
 			} else if (!match) {
 				fprintf(stderr,
-					"%s dependency %s does not stop "
-					"in level %c or halt and reboot\n",
+					"Error: %s dependency %s does "
+					"not stop in level %c or halt "
+					"and reboot\n",
 					ip->name, dstr,
 					initd_rc_level_char(rc));
 				return false;
 			}
+
+			/* Check if the required dep is marked for
+			 * removal. This happens when a script is
+			 * currently active but the changed field is
+			 * cleared. */
+			if (sk == SK_START)
+				match = (dep->astart & rc) &&
+					!(dep->cstart & rc);
+			else
+				match = (dep->astop & rc) &&
+					!(dep->cstop & rc);
+			if (match && required) {
+				fprintf(stderr,
+					"Error: %s required dependency %s"
+					" is marked for removal\n",
+					ip->name, dstr);
+				return false;
+			}
 		}
 	}
+
+	/* Mark the changed field as active for each script at this level */
+	ckey = (sk == SK_START) ? KEY_CSTART : KEY_CSTOP;
+	for (ip = ord->first; ip; ip = ip->next)
+		initd_set_rc(ip, ckey, rc);
 
 	/* If we get here, then we were successful */
 	return true;
