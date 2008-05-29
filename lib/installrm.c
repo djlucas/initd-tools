@@ -17,7 +17,8 @@
 static bool installrm_verbose = false;
 static void install_level_links(const initd_list_t *ilp,
 			const struct rcpair *rcp, initd_sk_t sk);
-static void remove_existing_link(const initd_t *ip, const char *rdir,
+static void remove_existing_link(const initd_t *ip,
+				const struct rcpair *rcp,
 				initd_sk_t sk);
 static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 			initd_sk_t sk, int *prio);
@@ -107,7 +108,7 @@ static void install_level_links(const initd_list_t *ilp,
 			if (!initd_is_active(ip, rc, KEY_ASTART))
 				continue;
 
-			remove_existing_link(ip, dir, sk);
+			remove_existing_link(ip, rcp, sk);
 		}
 	} else {
 		for (ip = ilp->last; ip; ip = ip->prev) {
@@ -115,7 +116,7 @@ static void install_level_links(const initd_list_t *ilp,
 			if (!initd_is_active(ip, rc, KEY_ASTOP))
 				continue;
 
-			remove_existing_link(ip, dir, sk);
+			remove_existing_link(ip, rcp, sk);
 		}
 	}
 
@@ -129,16 +130,23 @@ static void install_level_links(const initd_list_t *ilp,
 	}
 }
 
-static void remove_existing_link(const initd_t *ip, const char *rdir,
+static void remove_existing_link(const initd_t *ip,
+				const struct rcpair *rcp,
 				initd_sk_t sk)
 {
+	initd_key_t key;
 	strarg_t *links;
 	int n, nlinks;
+	initd_rc_t rc = rcp->rc;
+	char *rdir = rcp->dir;
 
-	if (sk == SK_START)
+	if (sk == SK_START) {
+		key = KEY_ASTART;
 		links = ip->astart_links;
-	else
+	} else {
+		key = KEY_ASTOP;
 		links = ip->astop_links;
+	}
 
 	/* See if any of the links exist in this directory */
 	nlinks = strarg_get_num(links);
@@ -157,6 +165,9 @@ static void remove_existing_link(const initd_t *ip, const char *rdir,
 				if (errno != ENOENT)
 					error(1, errno, "%s", path);
 			}
+
+			/* Clear the active bit for this level */
+			initd_clear_rc(ip, key, rc);
 		}
 	}
 }
@@ -168,15 +179,29 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 	char path[PATH_MAX];
 	char *tname;
 	char skc;
-	initd_rc_t rc, match;
+	initd_rc_t rc;
+	initd_key_t akey, ckey, dkey;
 
 	if (!ip || !rcp)
 		return;
 
-	/* Check if this service should be added to this level */
 	rc = rcp->rc;
-	match = (sk == SK_START) ? ip->dstart : ip->dstop;
-	if (!(match & rc))
+	if (sk == SK_START) {
+		akey = KEY_ASTART;
+		ckey = KEY_CSTART;
+		dkey = KEY_DSTART;
+	} else {
+		akey = KEY_ASTOP;
+		ckey = KEY_CSTOP;
+		dkey = KEY_DSTOP;
+	}
+
+	/* Check if this service should be run in this level */
+	if (!initd_is_active(ip, rc, dkey))
+		return;
+
+	/* Check if this service is to be removed from this level */
+	if (!initd_is_active(ip, rc, ckey))
 		return;
 
 	/* Set the current priority */
@@ -198,6 +223,9 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 	}
 	if (symlink(target, path) < 0)
 		error(1, errno, "%s -> %s", path, target);
+
+	/* Set the active bit for this level */
+	initd_set_rc(ip, akey, rc);
 }
 
 #define PRIOPATLEN 17
