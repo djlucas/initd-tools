@@ -42,15 +42,18 @@ testmountfslinks = rcS.d/S10mountfs rc0.d/K90mountfs rc6.d/K90mountfs
 testnetworklinks = rc0.d/K80network rc1.d/K80network rc2.d/S20network \
 	rc3.d/S20network rc4.d/S20network rc5.d/S20network rc6.d/K80network
 
+links: clean-links $(testlinks)
 testlinks = $(testmountfslinks) $(testnetworklinks)
 $(TESTS): $(testlinks)
 
-clean-local:
-	-rm -rf $(rctestdirs)
+clean-local: clean-links
 	-@if test "$(srcdir)" != "$(builddir)"; then \
 	  echo rm -rf init.d; \
 	  rm -rf init.d; \
 	fi
+
+clean-links:
+	-rm -rf $(rctestdirs)
 
 $(testmountfslinks): init.d/mountfs
 	@if test ! -f init.d/mountfs; then \
