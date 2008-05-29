@@ -70,11 +70,17 @@ bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_key_t key)
 	case KEY_ASTOP:
 		match = ip->astop;
 		break;
-	case KEY_CSTART:
-		match = ip->cstart;
+	case KEY_INSTART:
+		match = ip->instart;
 		break;
-	case KEY_CSTOP:
-		match = ip->cstop;
+	case KEY_INSTOP:
+		match = ip->instop;
+		break;
+	case KEY_RMSTART:
+		match = ip->rmstart;
+		break;
+	case KEY_RMSTOP:
+		match = ip->rmstop;
 		break;
 	case KEY_DSTART:
 		match = ip->dstart;
@@ -194,7 +200,7 @@ static void set_active_from_symlink(initd_list_t *ilp,
 	const char *tbase;
 	size_t idlen;
 	initd_t *ip;
-	initd_key_t key, ckey;
+	initd_key_t akey;
 
 	if (!(ilp || rcp || link || tgt))
 		return;
@@ -218,24 +224,20 @@ static void set_active_from_symlink(initd_list_t *ilp,
 
 	/* is this a start (S) or stop (K) link? */
 	if (link[0] == 'S') {
-		key = KEY_ASTART;
-		ckey = KEY_CSTART;
+		akey = KEY_ASTART;
 	} else if (link[0] == 'K') {
-		key = KEY_ASTOP;
-		ckey = KEY_CSTOP;
+		akey = KEY_ASTOP;
 	} else {
 		fprintf(stderr, "link %s is not a valid S or K link\n",
 			link);
 		return;
 	}
 
-	/* set this level as active and match in the changed field
-	 * of the initd_t */
-	initd_set_rc(ip, key, rcp->rc);
-	initd_set_rc(ip, ckey, rcp->rc);
+	/* set this level as active */
+	initd_set_rc(ip, akey, rcp->rc);
 
 	/* add the link to the active list */
-	add_active_link(ip, link, rcp, key);
+	add_active_link(ip, link, rcp, akey);
 }
 
 static void add_active_link(const initd_t *ip, const char *link,

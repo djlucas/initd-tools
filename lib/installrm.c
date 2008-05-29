@@ -180,7 +180,7 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 	char *tname;
 	char skc;
 	initd_rc_t rc;
-	initd_key_t akey, ckey, dkey;
+	initd_key_t akey, inkey, dkey;
 
 	if (!ip || !rcp)
 		return;
@@ -188,11 +188,11 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 	rc = rcp->rc;
 	if (sk == SK_START) {
 		akey = KEY_ASTART;
-		ckey = KEY_CSTART;
+		inkey = KEY_INSTART;
 		dkey = KEY_DSTART;
 	} else {
 		akey = KEY_ASTOP;
-		ckey = KEY_CSTOP;
+		inkey = KEY_INSTOP;
 		dkey = KEY_DSTOP;
 	}
 
@@ -200,8 +200,8 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 	if (!initd_is_active(ip, rc, dkey))
 		return;
 
-	/* Check if this service is to be removed from this level */
-	if (!initd_is_active(ip, rc, ckey))
+	/* Check if this service is to be installed at this level */
+	if (!initd_is_active(ip, rc, inkey))
 		return;
 
 	/* Set the current priority */

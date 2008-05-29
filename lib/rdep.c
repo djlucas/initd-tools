@@ -107,11 +107,11 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		if (initd_list_exists_name(rmlist, ip->name))
 			continue;
 
-		/* Clear the change field to mark for removal */
+		/* Set the remove field for all levels */
 		if (sk == SK_START)
-			ip->cstart = 0;
+			initd_set_rc(ip, KEY_RMSTART, RC_ALL);
 		else
-			ip->cstop = 0;
+			initd_set_rc(ip, KEY_RMSTOP, RC_ALL);
 
 		/* Add the initd_t to the rmlist */
 		initd_list_add(rmlist, initd_copy(ip));
@@ -192,7 +192,7 @@ static dep_t *add_all_active(const initd_list_t *pool,
 {
 	dep_t *active;
 	initd_t *ip;
-	initd_key_t key, ckey;
+	initd_key_t key, rmkey;
 
 	if (!pool)
 		return NULL;
@@ -200,17 +200,17 @@ static dep_t *add_all_active(const initd_list_t *pool,
 	active = dep_copy(init);
 	if (sk == SK_START) {
 		key = KEY_ASTART;
-		ckey = KEY_CSTART;
+		rmkey = KEY_RMSTART;
 	} else {
 		key = KEY_ASTOP;
-		ckey = KEY_CSTOP;
+		rmkey = KEY_RMSTOP;
 	}
 
 	for (ip = pool->first; ip; ip = ip->next) {
 		/* Add services if they are active on any level and
-		 * they are not marked for removal on all levels */
+		 * they are not marked for removal on any levels */
 		if (initd_is_active(ip, RC_ALL, key) &&
-			initd_is_active(ip, RC_ALL, ckey))
+			!initd_is_active(ip, RC_ALL, rmkey))
 			dep_add(active, ip->name);
 	}
 
@@ -387,33 +387,41 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				bool required)
 {
 	initd_t *ip, *dep;
-	initd_rc_t iprc;
 	dep_t *iprcdep;
 	char *dstr;
 	int n;
 	bool match;
+	initd_key_t dkey, inkey, rmkey;
 
 	if (!ord)
 		return false;
 
+	if (sk == SK_START) {
+		dkey = KEY_DSTART;
+		inkey = KEY_INSTART;
+		rmkey = KEY_RMSTART;
+	} else {
+		dkey = KEY_DSTOP;
+		inkey = KEY_INSTOP;
+		rmkey = KEY_RMSTOP;
+	}
+
 	/* Check the deps are valid in this level */
 	for (ip = ord->first; ip; ip = ip->next) {
 		if (sk == SK_START) {
-			iprc = ip->dstart;
 			if (required)
 				iprcdep = ip->rstart;
 			else
 				iprcdep = ip->sstart;
 		} else {
-			iprc = ip->dstop;
 			if (required)
 				iprcdep = ip->rstop;
 			else
 				iprcdep = ip->sstop;
 		}
 
-		/* Skip if the script isn't active at this level */
-		if (!(iprc & rc))
+		/* Skip if the script shoudn't run at this level */
+		if (!initd_is_active(ip, rc, dkey))
 			continue;
 
 		/* Check the deps */
@@ -465,15 +473,8 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 			}
 
 			/* Check if the required dep is marked for
-			 * removal. This happens when a script is
-			 * currently active but the changed field is
-			 * cleared. */
-			if (sk == SK_START)
-				match = (dep->astart & rc) &&
-					!(dep->cstart & rc);
-			else
-				match = (dep->astop & rc) &&
-					!(dep->cstop & rc);
+			 * removal. */
+			match = initd_is_active(dep, rc, rmkey);
 			if (match && required) {
 				fprintf(stderr,
 					"Error: %s required dependency %s"
@@ -482,6 +483,11 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				return false;
 			}
 		}
+
+		/* Now that we're successful, mark this script for
+		 * installation if it's not marked for removal */
+		if (!initd_is_active(ip, rc, rmkey))
+			initd_set_rc(ip, inkey, rc);
 	}
 
 	/* If we get here, then we were successful */

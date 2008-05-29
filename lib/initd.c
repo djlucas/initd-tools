@@ -22,7 +22,8 @@ initd_t *initd_new(const char *name) {
 
 	ip->dstart = ip->dstop = 0;
 	ip->astart = ip->astop = 0;
-	ip->cstart = ip->cstop = 0;
+	ip->instart = ip->instop = 0;
+	ip->rmstart = ip->rmstop = 0;
 
 	ip->astart_links = strarg_new();
 	ip->astop_links = strarg_new();
@@ -85,8 +86,10 @@ initd_t *initd_copy(const initd_t *source)
 	dest->dstop = source->dstop;
 	dest->astart = source->astart;
 	dest->astop = source->astop;
-	dest->cstart = source->cstart;
-	dest->cstop = source->cstop;
+	dest->instart = source->instart;
+	dest->instop = source->instop;
+	dest->rmstart = source->rmstart;
+	dest->rmstop = source->rmstop;
 
 	dest->astart_links = strarg_copy(source->astart_links);
 	dest->astop_links = strarg_copy(source->astop_links);
@@ -147,10 +150,14 @@ static initd_rc_t *initd_get_rc_from_key(const initd_t *ip,
 		return (initd_rc_t *) &ip->astart;
 	case KEY_ASTOP:
 		return (initd_rc_t *) &ip->astop;
-	case KEY_CSTART:
-		return (initd_rc_t *) &ip->cstart;
-	case KEY_CSTOP:
-		return (initd_rc_t *) &ip->cstop;
+	case KEY_INSTART:
+		return (initd_rc_t *) &ip->instart;
+	case KEY_INSTOP:
+		return (initd_rc_t *) &ip->instop;
+	case KEY_RMSTART:
+		return (initd_rc_t *) &ip->rmstart;
+	case KEY_RMSTOP:
+		return (initd_rc_t *) &ip->rmstop;
 	case KEY_DSTART:
 		return (initd_rc_t *) &ip->dstart;
 	case KEY_DSTOP:
