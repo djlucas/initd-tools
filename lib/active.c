@@ -76,6 +76,12 @@ bool initd_is_active(const initd_t *ip, initd_rc_t rc, initd_key_t key)
 	case KEY_CSTOP:
 		match = ip->cstop;
 		break;
+	case KEY_DSTART:
+		match = ip->dstart;
+		break;
+	case KEY_DSTOP:
+		match = ip->dstop;
+		break;
 	default:
 		/* Wrong key type */
 		return false;
