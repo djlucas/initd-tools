@@ -392,7 +392,6 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 	char *dstr;
 	int n;
 	bool match;
-	initd_key_t ckey;
 
 	if (!ord)
 		return false;
@@ -484,11 +483,6 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 			}
 		}
 	}
-
-	/* Mark the changed field as active for each script at this level */
-	ckey = (sk == SK_START) ? KEY_CSTART : KEY_CSTOP;
-	for (ip = ord->first; ip; ip = ip->next)
-		initd_set_rc(ip, ckey, rc);
 
 	/* If we get here, then we were successful */
 	return true;
