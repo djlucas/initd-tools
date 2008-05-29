@@ -75,6 +75,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 	initd_list_t *rmlist = NULL, *all = NULL, *chain = NULL;
 	initd_t *ip;
 	int n;
+	initd_key_t akey, rmkey;
 	dep_t *all_active = NULL;
 	char *rm;
 
@@ -90,6 +91,14 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 
 	/* initialize the initd remove list */
 	rmlist = initd_list_new();
+
+	if (sk == SK_START) {
+		akey = KEY_ASTART;
+		rmkey = KEY_RMSTART;
+	} else {
+		akey = KEY_ASTOP;
+		rmkey = KEY_RMSTOP;
+	}
 
 	/* Check that the specified services to remove are in the pool.
 	 * If they are, clear their changed bits to mark them for
@@ -107,11 +116,13 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		if (initd_list_exists_name(rmlist, ip->name))
 			continue;
 
+		/* If the script isn't currently active in any level, we
+		 * can move along. */
+		if (!initd_is_active(ip, RC_ALL, akey))
+			continue;
+
 		/* Set the remove field for all levels */
-		if (sk == SK_START)
-			initd_set_rc(ip, KEY_RMSTART, RC_ALL);
-		else
-			initd_set_rc(ip, KEY_RMSTOP, RC_ALL);
+		initd_set_rc(ip, rmkey, RC_ALL);
 
 		/* Add the initd_t to the rmlist */
 		initd_list_add(rmlist, initd_copy(ip));
