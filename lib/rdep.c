@@ -138,15 +138,23 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		goto err;
 	}
 
+	/* Append the rmlist to the all list. Since they are marked for
+	 * removal, they won't be reinstalled. */
+	for (ip = rmlist->first; ip; ip = ip->next) {
+		/* Don't duplicate */
+		if (!initd_list_exists_name(all, ip->name))
+			initd_list_add(all, ip);
+	}
+
 	/* If we got here, we're successful */
 	goto out;
 err:
 	initd_list_free(all);
 	all = NULL;
+	initd_list_free(rmlist);
 out:
 	initd_list_free(chain);
 	dep_free(all_active);
-	initd_list_free(rmlist);
 	return all;
 }
 
