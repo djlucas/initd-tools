@@ -29,6 +29,7 @@ fi
 AC_CONFIG_FILES([
 Makefile
 lib/Makefile
+src/Makefile
 test/Makefile
 ])
 

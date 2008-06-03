@@ -1,1 +1,1 @@
-SUBDIRS = lib test
+SUBDIRS = lib src test
