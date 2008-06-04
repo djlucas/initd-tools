@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "initd.h"
-#include "str.h"
 
 static void print_initd(initd_t *ip);
 static void print_level(initd_rc_t rc);

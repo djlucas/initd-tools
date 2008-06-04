@@ -2,8 +2,11 @@
 #define _initd_h_
 
 #include <stdbool.h>
+#include "str.h"
 #include "types.h"
+#include "util.h"
 #include "rdep.h"
+#include "installrm.h"
 
 #ifndef DEF_INITD_DIR
 #define DEF_INITD_DIR "/etc/init.d"

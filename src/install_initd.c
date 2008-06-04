@@ -7,9 +7,6 @@
 #include <errno.h>
 #include <getopt.h>
 #include "initd.h"
-#include "types.h"
-#include "rdep.h"
-#include "installrm.h"
 
 #ifndef _GNU_SOURCE
 char *program_invocation_name = NULL;

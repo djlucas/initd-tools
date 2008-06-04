@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include "types.h"
 #include "rdep.h"
+#include "initd.h"
 
 static bool rdep_verbose = false;
 static dep_t *add_all_active(const initd_list_t *pool,

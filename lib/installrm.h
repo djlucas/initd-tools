@@ -2,7 +2,7 @@
 #define _installrm_h_
 
 #include <stdbool.h>
-#include "initd.h"
+#include "types.h"
 
 extern bool initd_installrm_links(const initd_list_t *ilp,
 				const char *dir, initd_sk_t sk);

@@ -13,6 +13,7 @@
 #include <glob.h>
 #include "installrm.h"
 #include "rcint.h"
+#include "initd.h"
 
 static bool installrm_verbose = false;
 static void install_level_links(const initd_list_t *ilp,

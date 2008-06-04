@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <error.h>
 #include <errno.h>
-#include "str.h"
+#include "initd.h"
 
 int main(int argc, char *argv[])
 {

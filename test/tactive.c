@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "initd.h"
-#include "str.h"
 
 static void print_actives(const initd_list_t *ilp);
 static void print_rc_string(const initd_t *ip, initd_sk_t sk);

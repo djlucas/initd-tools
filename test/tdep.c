@@ -3,7 +3,7 @@
 #endif
 #include <stdio.h>
 #include <string.h>
-#include "types.h"
+#include "initd.h"
 
 static void print_dep(dep_t *sa);
 

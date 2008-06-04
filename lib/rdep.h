@@ -2,7 +2,6 @@
 #define _dep_h_
 
 #include <stdbool.h>
-#include "initd.h"
 #include "types.h"
 
 extern initd_list_t *initd_add_recurse_deps(initd_list_t *pool,

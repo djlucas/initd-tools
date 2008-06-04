@@ -3,8 +3,6 @@
 #endif
 #include <stdio.h>
 #include "initd.h"
-#include "types.h"
-#include "rdep.h"
 
 static void print_sk_list(const initd_list_t *list, initd_sk_t sk);
 static bool check_scripts_active(const initd_list_t *list, dep_t *scripts);

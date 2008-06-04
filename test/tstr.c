@@ -3,7 +3,7 @@
 #endif
 #include <stdio.h>
 #include <string.h>
-#include "str.h"
+#include "initd.h"
 
 int main(int argc, char *argv[])
 {

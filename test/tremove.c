@@ -3,9 +3,6 @@
 #endif
 #include <stdio.h>
 #include "initd.h"
-#include "types.h"
-#include "rdep.h"
-#include "installrm.h"
 
 static void print_sk_list(const initd_list_t *list, initd_sk_t sk);
 
