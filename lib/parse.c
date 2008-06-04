@@ -7,8 +7,8 @@
 #include <error.h>
 #include <errno.h>
 #include <ctype.h>
-#include <libgen.h>
 #include "initd.h"
+#include "util.h"
 
 static FILE *initd_open(const char *path);
 static void initd_close(FILE *ifd);
@@ -23,14 +23,16 @@ static void initd_parse_line_tokens(initd_t *ip, const char *line,
    script was not valid. */
 initd_t *initd_parse(const char *path)
 {
-	char line[INITD_LINE_MAX];
+	char line[INITD_LINE_MAX], *name;
 	size_t nchar;
 	int in_header, is_initd;
 	initd_key_t key;
-	initd_t *ip = NULL;
+	initd_t *ip;
 	FILE *ifd = initd_open(path);
 
-	ip = initd_new(basename((char *)path));
+	name = initd_basename(path);
+	ip = initd_new(name);
+	free(name);
 
 	in_header = is_initd = 0;
 	key = KEY_NONE;
