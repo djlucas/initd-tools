@@ -26,6 +26,16 @@ if test "x$enable_werror" != xno; then
 	fi
 fi
 
+AC_ARG_WITH([initd-dir],
+	[AS_HELP_STRING([--with-initd-dir=DIR],
+	[Set the default initd directory @<:@/etc/init.d@:>@])],
+	[initd_dir="$withval"],
+	[initd_dir=/etc/init.d]
+)
+AC_DEFINE_UNQUOTED([DEF_INITD_DIR], ["$initd_dir"],
+	[Default init.d directory]
+)
+
 AC_CONFIG_FILES([
 Makefile
 lib/Makefile
