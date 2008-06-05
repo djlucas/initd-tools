@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "str.h"
+#include "initd-str.h"
 
 static char *d_string_grow(char *ds, size_t len);
 

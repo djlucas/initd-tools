@@ -6,8 +6,8 @@
 #include <string.h>
 #include <limits.h>
 #include <stdarg.h>
-#include "types.h"
-#include "rdep.h"
+#include "initd-types.h"
+#include "initd-rdep.h"
 #include "initd.h"
 
 static bool rdep_verbose = false;

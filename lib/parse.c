@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include "initd.h"
-#include "util.h"
+#include "initd-util.h"
 
 static FILE *initd_open(const char *path);
 static void initd_close(FILE *ifd);

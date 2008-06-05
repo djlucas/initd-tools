@@ -6,7 +6,7 @@
 #include <libgen.h>
 #include <error.h>
 #include <errno.h>
-#include "util.h"
+#include "initd-util.h"
 
 /* Wrappers around basename() and dirname() */
 char *initd_basename(const char *path)

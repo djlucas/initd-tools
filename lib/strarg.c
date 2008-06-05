@@ -5,7 +5,7 @@
 #include <error.h>
 #include <errno.h>
 #include <string.h>
-#include "str.h"
+#include "initd-str.h"
 
 strarg_t *strarg_new(void)
 {

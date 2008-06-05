@@ -15,7 +15,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include "initd.h"
-#include "str.h"
+#include "initd-str.h"
 
 initd_list_t *initd_list_new(void)
 {

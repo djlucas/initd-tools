@@ -6,7 +6,7 @@
 #include <error.h>
 #include <errno.h>
 #include "initd.h"
-#include "str.h"
+#include "initd-str.h"
 
 static initd_rc_t *initd_get_rc_from_key(const initd_t *ip,
 					initd_key_t key);

@@ -13,8 +13,8 @@
 #include <errno.h>
 #include <string.h>
 #include "initd.h"
-#include "str.h"
-#include "rcint.h"
+#include "initd-str.h"
+#include "initd-rcint.h"
 
 static bool active_verbose = false;
 static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp);

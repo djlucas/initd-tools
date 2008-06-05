@@ -1,5 +1,5 @@
-#ifndef _rcint_h_
-#define _rcint_h_
+#ifndef _initd_rcint_h_
+#define _initd_rcint_h_
 
 struct rcpair {
 	char *dir;
@@ -27,4 +27,4 @@ static struct rcpair rcdirs[] = {
 	{ NULL, 0 }
 };
 
-#endif /* _rcint_h_ */
+#endif /* _initd_rcint_h_ */

@@ -1,5 +1,5 @@
-#ifndef _str_h_
-#define _str_h_
+#ifndef _initd_str_h_
+#define _initd_str_h_
 
 #include <stdbool.h>
 
@@ -22,4 +22,4 @@ extern unsigned int strarg_get_num(const strarg_t *sp);
 extern char *strarg_get_str(const strarg_t *sp, unsigned int index);
 extern strarg_t *strarg_copy(const strarg_t *source);
 
-#endif /* _str_h_ */
+#endif /* _initd_str_h_ */

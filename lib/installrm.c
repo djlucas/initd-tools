@@ -11,8 +11,8 @@
 #include <string.h>
 #include <limits.h>
 #include <glob.h>
-#include "installrm.h"
-#include "rcint.h"
+#include "initd-installrm.h"
+#include "initd-rcint.h"
 #include "initd.h"
 
 static bool installrm_verbose = false;

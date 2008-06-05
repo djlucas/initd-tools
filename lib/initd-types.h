@@ -1,7 +1,7 @@
-#ifndef _types_h_
-#define _types_h_
+#ifndef _initd_types_h_
+#define _initd_types_h_
 
-#include "str.h"
+#include "initd-str.h"
 
 /* keys in the initd type */
 typedef enum initd_key {
@@ -112,4 +112,4 @@ typedef struct initd_list {
 	initd_t *last;
 } initd_list_t;
 
-#endif /* _types_h_ */
+#endif /* _initd_types_h_ */
