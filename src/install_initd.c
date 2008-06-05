@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include "initd.h"
+#include "util.h"
 
 #ifndef _GNU_SOURCE
 char *program_invocation_name = NULL;
@@ -22,7 +23,6 @@ static struct option long_opts[] = {
 };
 
 static void usage(FILE *stream);
-static void set_verbose(void);
 
 int main(int argc, char *argv[])
 {
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 			usage(stdout);
 			exit(EXIT_SUCCESS);
 		case 'v':
-			set_verbose();
+			set_verbose(true);
 			break;
 		case '?':
 			error(EXIT_FAILURE, 0,
@@ -56,14 +56,15 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (optind < argc) {
-		while (optind < argc)
-			dep_add(need, argv[optind++]);
-	} else {
+	/* At least one service must be provided */
+	if (optind >= argc)
 		error(EXIT_FAILURE, 0, "No services supplied\n"
 			"See `%s --help' for usage",
 			program_invocation_name);
-	}
+
+	/* Process the services */
+	while (optind < argc)
+		dep_add(need, argv[optind++]);
 
 	if (!id_dir)
 		id_dir = DEF_INITD_DIR;
@@ -107,10 +108,4 @@ static void usage(FILE *stream)
 		"to be relative to the default service directory, %s.\n",
 		program_invocation_name,
 		DEF_INITD_DIR);
-}
-
-static void set_verbose(void)
-{
-	initd_recurse_set_verbose(true);
-	initd_installrm_set_verbose(true);
 }
