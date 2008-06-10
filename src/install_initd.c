@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 {
 	char *id_dir = NULL;
 	initd_list_t *all, *startlist, *stoplist;
+	strarg_t *srvargs = strarg_new();
 	dep_t *need = dep_new();
 
 	/* parse arguments */
@@ -63,11 +64,14 @@ int main(int argc, char *argv[])
 			program_invocation_name);
 
 	/* Process the services */
-	while (optind < argc)
-		dep_add(need, argv[optind++]);
+	while (optind < argc) {
+		char *arg = argv[optind++];
+		strarg_add(srvargs, arg);
+		dep_add(need, initd_basename(arg));
+	}
 
 	/* Set the initd directory from the arguments */
-	if (!set_initd_dir(&id_dir, need))
+	if (!set_initd_dir(&id_dir, srvargs))
 		exit(EXIT_FAILURE);
 
 	all = initd_list_from_dir(id_dir);
