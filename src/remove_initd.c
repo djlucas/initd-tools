@@ -66,8 +66,9 @@ int main(int argc, char *argv[])
 	while (optind < argc)
 		dep_add(need, argv[optind++]);
 
-	if (!id_dir)
-		id_dir = DEF_INITD_DIR;
+	/* Set the initd directory from the arguments */
+	if (!set_initd_dir(&id_dir, need))
+		exit(EXIT_FAILURE);
 
 	all = initd_list_from_dir(id_dir);
 
