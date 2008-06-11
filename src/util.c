@@ -69,3 +69,42 @@ void set_verbose(bool verbose)
 	initd_recurse_set_verbose(verbose);
 	initd_installrm_set_verbose(verbose);
 }
+
+bool installrm_action(const dep_t *services, const char *initd_dir,
+		bool install)
+{
+	initd_list_t *all, *startlist, *stoplist;
+
+	/* Collect all the services in the init.d dir */
+	all = initd_list_from_dir(initd_dir);
+
+	/* Recurse the deps for the Starting */
+	if (install)
+		startlist = initd_add_recurse_deps(all, SK_START,
+						services);
+	else
+		startlist = initd_remove_recurse_deps(all, SK_START,
+						services);
+	if (!startlist)
+		goto err;
+
+	/* Recurse the deps for the Stopping */
+	if (install)
+		stoplist = initd_add_recurse_deps(all, SK_STOP,
+						services);
+	else
+		stoplist = initd_remove_recurse_deps(all, SK_STOP,
+						services);
+	if (!stoplist)
+		goto err;
+
+	/* Install and/or remove the symlinks */
+	if (!initd_installrm_links(startlist, initd_dir, SK_START))
+		goto err;
+	if (!initd_installrm_links(stoplist, initd_dir, SK_STOP))
+		goto err;
+
+	return true;
+err:
+	return false;
+}

@@ -27,7 +27,6 @@ static void usage(FILE *stream);
 int main(int argc, char *argv[])
 {
 	char *id_dir = NULL;
-	initd_list_t *all, *startlist, *stoplist;
 	strarg_t *srvargs = strarg_new();
 	dep_t *need = dep_new();
 
@@ -74,19 +73,8 @@ int main(int argc, char *argv[])
 	if (!set_initd_dir(&id_dir, srvargs))
 		exit(EXIT_FAILURE);
 
-	all = initd_list_from_dir(id_dir);
-
-	startlist = initd_remove_recurse_deps(all, SK_START, need);
-	if (!startlist)
-		exit(EXIT_FAILURE);
-
-	stoplist = initd_remove_recurse_deps(all, SK_STOP, need);
-	if (!stoplist)
-		exit(EXIT_FAILURE);
-
-	if (!initd_installrm_links(startlist, id_dir, SK_START))
-		exit(EXIT_FAILURE);
-	if (!initd_installrm_links(stoplist, id_dir, SK_STOP))
+	/* Process dependencies and remove links */
+	if (!installrm_action(need, id_dir, false))
 		exit(EXIT_FAILURE);
 
 	return 0;
