@@ -1,2 +1,4 @@
 install_initd
 remove_initd
+install_initd.8
+remove_initd.8

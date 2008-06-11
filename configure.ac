@@ -33,13 +33,19 @@ AC_ARG_WITH([initd-dir],
 	[initd_dir=/etc/init.d]
 )
 AC_DEFINE_UNQUOTED([DEF_INITD_DIR], ["$initd_dir"],
-	[Default init.d directory]
-)
+	[Default init.d directory])
+AC_SUBST([DEF_INITD_DIR], ["$initd_dir"])
+
+dnl Substituted in manpages
+RELDATE=`${DATE-date} -u +'%d %b %Y' 2>/dev/null`
+AC_SUBST([RELDATE])
 
 AC_CONFIG_FILES([
 Makefile
 lib/Makefile
 src/Makefile
+src/install_initd.8
+src/remove_initd.8
 test/Makefile
 ])
 
