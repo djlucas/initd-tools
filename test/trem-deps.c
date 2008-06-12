@@ -5,7 +5,6 @@
 #include "initd.h"
 
 static void print_sk_list(const initd_list_t *list, initd_sk_t sk);
-static bool check_scripts_active(const initd_list_t *list, dep_t *scripts);
 
 int main(int argc, char *argv[])
 {
@@ -26,9 +25,6 @@ int main(int argc, char *argv[])
 
 	all = initd_list_from_dir("init.d");
 
-	if (!check_scripts_active(all, rem))
-		return 1;
-
 	initd_recurse_set_verbose(true);
 	startlist = initd_remove_recurse_deps(all, SK_START, rem);
 	if (startlist) {
@@ -45,9 +41,6 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Failed recursing stop scripts\n");
 		return 1;
 	}
-
-	if (!check_scripts_active(all, rem))
-		return 1;
 
 	return 0;
 }
@@ -77,27 +70,4 @@ static void print_sk_list(const initd_list_t *list, initd_sk_t sk)
 	} else {
 		printf("%s list is empty\n", startstop);
 	}
-}
-
-static bool check_scripts_active(const initd_list_t *list, dep_t *scripts)
-{
-	int n;
-	initd_t *ip;
-
-	/* Check that all the requested scripts are active */
-	for (n = 0; n < dep_get_num(scripts); n++) {
-		ip = initd_list_find_name(list, dep_get_dep(scripts, n));
-		if (!ip) {
-			fprintf(stderr, "No script named %s\n",
-				dep_get_dep(scripts, n));
-			return false;
-		}
-		if (!(ip->astart & RC_ALL) || !(ip->astop & RC_ALL)) {
-			fprintf(stderr, "Script %s is not active\n",
-				ip->name);
-			return false;
-		}
-	}
-
-	return true;
 }
