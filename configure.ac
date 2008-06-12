@@ -27,6 +27,15 @@ if test "x$enable_werror" != xno; then
 	fi
 fi
 
+# Want programs in /sbin and symlinks in /lib/initd, but man pages
+# in /usr/share by default
+AC_PREFIX_DEFAULT([/usr])
+AC_MSG_CHECKING([for exec_prefix to use])
+if test "x$prefix" = xNONE && test "x$exec_prefix" = xNONE; then
+	exec_prefix=''
+fi
+AC_MSG_RESULT([\"$exec_prefix\"])
+
 AC_ARG_WITH([initd-dir],
 	[AS_HELP_STRING([--with-initd-dir=DIR],
 	[Set the default initd directory @<:@/etc/init.d@:>@])],

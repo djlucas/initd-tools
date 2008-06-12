@@ -11,7 +11,7 @@ remove_initd_LDADD = $(top_builddir)/lib/libinitd.la
 man_MANS = install_initd.8 remove_initd.8
 
 # /lib/initd symlinks
-libinitddir = $(libdir)/initd
+libinitddir = $(exec_prefix)/lib/initd
 install-exec-hook:
 	$(MKDIR_P) $(DESTDIR)$(libinitddir)
 	rm -f $(DESTDIR)$(libinitddir)/install_initd
