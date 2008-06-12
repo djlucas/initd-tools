@@ -98,8 +98,20 @@ static void install_level_links(const initd_list_t *ilp,
 #endif
 
 	/* Change to the rc directory */
-	if (chdir(dir) != 0)
-		error(1, errno, "%s", dir);
+	if (chdir(dir) < 0) {
+		/* Create it if it doesn't exist */
+		if (errno == ENOENT) {
+			errno = 0;
+			mode_t dirmode = (S_IRWXU|S_IRWXG|S_IRWXO);
+			if (mkdir(dir, dirmode) < 0)
+				error(1, errno, "%s", dir);
+			/* Change to the created directory */
+			if (chdir(dir) < 0)
+				error(1, errno, "%s", dir);
+		} else {
+			error(1, errno, "%s", dir);
+		}
+	}
 
 	/* First remove existing links, beginning with the head of the
 	 * list for start links. */
