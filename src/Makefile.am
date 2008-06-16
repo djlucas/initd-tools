@@ -14,12 +14,15 @@ man_MANS = install_initd.8 remove_initd.8
 libinitddir = $(exec_prefix)/lib/initd
 install-exec-hook:
 	$(MKDIR_P) $(DESTDIR)$(libinitddir)
-	rm -f $(DESTDIR)$(libinitddir)/install_initd
-	$(LN_S) $(sbindir)/install_initd \
-	  $(DESTDIR)$(libinitddir)/install_initd
-	rm -f $(DESTDIR)$(libinitddir)/remove_initd
-	$(LN_S) $(sbindir)/remove_initd \
-	  $(DESTDIR)$(libinitddir)/remove_initd
+	@relpath=`$(SHELL) $(top_srcdir)/abs2rel.sh $(sbindir) $(libinitddir)` \
+	  || relpath=$(sbindir); \
+	for prog in install_initd remove_initd; do \
+	  echo rm -f $(DESTDIR)$(libinitddir)/$$prog && \
+	  rm -f $(DESTDIR)$(libinitddir)/$$prog && \
+	  echo $(LN_S) $$relpath/$$prog $(DESTDIR)$(libinitddir)/$$prog && \
+	  $(LN_S) $$relpath/$$prog $(DESTDIR)$(libinitddir)/$$prog \
+	  || exit $?; \
+	done
 
 uninstall-hook:
 	rm -f $(DESTDIR)$(libinitddir)/install_initd
