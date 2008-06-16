@@ -5,6 +5,7 @@
 .libs
 /auto
 /autom4te.cache
+ChangeLog
 Makefile.in
 Makefile
 aclocal.m4
