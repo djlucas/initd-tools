@@ -6,6 +6,7 @@
 /auto
 /autom4te.cache
 ChangeLog
+INSTALL
 Makefile.in
 Makefile
 aclocal.m4

@@ -1,6 +1,6 @@
 AC_INIT([initd-tools],[0.1],[dbn.lists@gmail.com])
 AC_CONFIG_AUX_DIR([auto])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS([config.h])
 AC_GNU_SOURCE
