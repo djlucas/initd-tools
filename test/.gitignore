@@ -11,4 +11,5 @@ tadd-deps2
 trem-deps
 tinstall
 tremove
+init.d
 rc?.d

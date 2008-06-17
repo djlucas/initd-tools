@@ -1,8 +1,10 @@
 INCLUDES = -I$(top_srcdir)/lib
 
 runtestscripts = $(srcdir)/tparse.sh $(srcdir)/tparse-dir.sh
-testscripts = init.d/bar init.d/foo init.d/barf init.d/dual-headers \
-	init.d/mountfs init.d/network
+testscripts = service/bar service/foo service/barf service/mountfs \
+	service/network service/dual-headers
+initdtestscripts = init.d/bar init.d/foo init.d/barf init.d/mountfs \
+	init.d/network init.d/dual-headers
 
 EXTRA_DIST = $(runtestscripts) $(testscripts)
 TESTS = tstr tstrarg tdep $(runtestscripts) tinitd tinitd-list tactive \
@@ -44,31 +46,27 @@ testnetworklinks = rc0.d/K80network rc1.d/K80network rc2.d/S20network \
 
 links: clean-links $(testlinks)
 testlinks = $(testmountfslinks) $(testnetworklinks)
-$(TESTS): $(testlinks)
+$(TESTS): $(initdtestscripts) $(testlinks)
 
-clean-local: clean-links
-	-@if test "$(srcdir)" != "$(builddir)"; then \
-	  echo rm -rf init.d; \
-	  rm -rf init.d; \
-	fi
-
+clean-local: clean-initd clean-links
+clean-initd:
+	-rm -rf init.d
 clean-links:
 	-rm -rf $(rctestdirs)
 
+init.d:
+	mkdir -p $@
+$(initdtestscripts): init.d $(testscripts)
+	@orig=`echo $@ | sed 's,init.d,service,'` && \
+	echo cp -f $(srcdir)/$$orig $@ && \
+	cp -f $(srcdir)/$$orig $@
+
 $(testmountfslinks): init.d/mountfs
-	@if test ! -f init.d/mountfs; then \
-	  test -d init.d || mkdir init.d 2>/dev/null || :; \
-	  cp -p $(srcdir)/init.d/mountfs init.d/mountfs; \
-	fi
-	@tdir=`dirname $@`; test -d $$tdir || mkdir $$tdir || :
+	@tdir=`dirname $@`; test -d $$tdir || mkdir -p $$tdir
 	rm -f $@
 	ln -s ../init.d/mountfs $@
 
 $(testnetworklinks): init.d/network
-	@if test ! -f init.d/network; then \
-	  test -d init.d || mkdir init.d 2>/dev/null || :; \
-	  cp -p $(srcdir)/init.d/network init.d/network; \
-	fi
-	@tdir=`dirname $@`; test -d $$tdir || mkdir $$tdir || :
+	@tdir=`dirname $@`; test -d $$tdir || mkdir -p $$tdir
 	rm -f $@
 	ln -s ../init.d/network $@

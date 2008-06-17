@@ -1,6 +1,5 @@
 #!/bin/sh
 
-: ${srcdir:=.}
 : ${builddir:=.}
 
-exec "$builddir/tparse-dir" "$srcdir/init.d"
+exec "$builddir/tparse-dir" "$builddir/init.d"
