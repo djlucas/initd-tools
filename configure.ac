@@ -30,15 +30,15 @@ fi
 # want programs in /usr/lib/initd by default
 AC_PREFIX_DEFAULT([/usr])
 
-AC_ARG_WITH([initd-dir],
-	[AS_HELP_STRING([--with-initd-dir=DIR],
+AC_ARG_WITH([initddir],
+	[AS_HELP_STRING([--with-initddir=DIR],
 	[Set the default initd directory @<:@/etc/init.d@:>@])],
-	[initd_dir="$withval"],
-	[initd_dir=/etc/init.d]
+	[initddir="$withval"],
+	[initddir=/etc/init.d]
 )
-AC_DEFINE_UNQUOTED([DEF_INITD_DIR], ["$initd_dir"],
+AC_DEFINE_UNQUOTED([DEF_INITD_DIR], ["$initddir"],
 	[Default init.d directory])
-AC_SUBST([DEF_INITD_DIR], ["$initd_dir"])
+AC_SUBST([DEF_INITD_DIR], ["$initddir"])
 
 AC_ARG_WITH([initdlibdir],
 	[AS_HELP_STRING([--with-initdlibdir=DIR],
