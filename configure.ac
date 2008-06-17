@@ -46,6 +46,14 @@ AC_DEFINE_UNQUOTED([DEF_INITD_DIR], ["$initd_dir"],
 	[Default init.d directory])
 AC_SUBST([DEF_INITD_DIR], ["$initd_dir"])
 
+AC_ARG_WITH([initdlibdir],
+	[AS_HELP_STRING([--with-initdlibdir=DIR],
+	[Set the default initd libdir @<:@${exec_prefix}/lib/initd@:>@])],
+	[libinitddir="$withval"],
+	[libinitddir='${exec_prefix}/lib/initd']
+)
+AC_SUBST([libinitddir])
+
 dnl Substituted in manpages
 RELDATE=`${DATE-date} -u +'%d %b %Y' 2>/dev/null`
 AC_SUBST([RELDATE])

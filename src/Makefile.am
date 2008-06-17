@@ -1,6 +1,6 @@
 INCLUDES = -I$(top_srcdir)/lib
 
-sbin_PROGRAMS = install_initd remove_initd
+libinitd_PROGRAMS = install_initd remove_initd
 
 install_initd_SOURCES = install_initd.c util.h util.c
 install_initd_LDADD = $(top_builddir)/lib/libinitd.la
@@ -10,20 +10,19 @@ remove_initd_LDADD = $(top_builddir)/lib/libinitd.la
 
 man_MANS = install_initd.8 remove_initd.8
 
-# /lib/initd symlinks
-libinitddir = $(exec_prefix)/lib/initd
+# sbindir symlinks
 install-exec-hook:
-	$(MKDIR_P) $(DESTDIR)$(libinitddir)
-	@relpath=`$(SHELL) $(top_srcdir)/abs2rel.sh $(sbindir) $(libinitddir)` \
-	  || relpath=$(sbindir); \
+	$(MKDIR_P) $(DESTDIR)$(sbindir)
+	@relpath=`$(SHELL) $(top_srcdir)/abs2rel.sh $(libinitddir) $(sbindir)` \
+	  || relpath=$(libinitddir); \
 	for prog in install_initd remove_initd; do \
-	  echo rm -f $(DESTDIR)$(libinitddir)/$$prog && \
-	  rm -f $(DESTDIR)$(libinitddir)/$$prog && \
-	  echo $(LN_S) $$relpath/$$prog $(DESTDIR)$(libinitddir)/$$prog && \
-	  $(LN_S) $$relpath/$$prog $(DESTDIR)$(libinitddir)/$$prog \
+	  echo rm -f $(DESTDIR)$(sbindir)/$$prog && \
+	  rm -f $(DESTDIR)$(sbindir)/$$prog && \
+	  echo $(LN_S) $$relpath/$$prog $(DESTDIR)$(sbindir)/$$prog && \
+	  $(LN_S) $$relpath/$$prog $(DESTDIR)$(sbindir)/$$prog \
 	  || exit $?; \
 	done
 
 uninstall-hook:
-	rm -f $(DESTDIR)$(libinitddir)/install_initd
-	rm -f $(DESTDIR)$(libinitddir)/remove_initd
+	rm -f $(DESTDIR)$(sbindir)/install_initd
+	rm -f $(DESTDIR)$(sbindir)/remove_initd
