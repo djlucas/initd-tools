@@ -2,6 +2,10 @@ AC_INIT([initd-tools],[0.1],[dbn.lists@gmail.com])
 AC_CONFIG_AUX_DIR([auto])
 AM_INIT_AUTOMAKE
 
+dnl Substituted in manpages
+RELDATE='31 Aug 2008'
+AC_SUBST([RELDATE])
+
 AC_CONFIG_HEADERS([config.h])
 AC_GNU_SOURCE
 
@@ -47,10 +51,6 @@ AC_ARG_WITH([initdlibdir],
 	[libinitddir='${exec_prefix}/lib/initd']
 )
 AC_SUBST([libinitddir])
-
-dnl Substituted in manpages
-RELDATE=`${DATE-date} -u +'%d %b %Y' 2>/dev/null`
-AC_SUBST([RELDATE])
 
 AC_CONFIG_FILES([
 Makefile
