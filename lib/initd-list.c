@@ -8,10 +8,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <dirent.h>
-#ifndef _DIRENT_HAVE_D_TYPE
 #include <sys/stat.h>
 #include <unistd.h>
-#endif
 #include <limits.h>
 #include <stdio.h>
 #include "initd.h"
@@ -114,16 +112,11 @@ initd_list_t *initd_list_from_dir(const char *dir)
 		if (plen < 0)
 			error(2, errno, "%s", de->d_name);
 
-#ifdef _DIRENT_HAVE_D_TYPE
-		if ((!de->d_type) || (de->d_type != DT_REG))
-			continue;
-#else
 		struct stat ip_buf;
 		if (stat(ip_path, &ip_buf) < 0)
 			error(2, errno, "%s", ip_path);
 		if (!S_ISREG(ip_buf.st_mode))
 			continue;
-#endif /* _DIRENT_HAVE_D_TYPE */
 
 		ip = initd_parse(ip_path);
 		if (ip) {
