@@ -31,7 +31,7 @@ if test "x$enable_werror" != xno; then
 	fi
 fi
 
-# want programs in /usr/lib/initd by default
+# want programs in /usr/lib/lsb by default
 AC_PREFIX_DEFAULT([/usr])
 
 AC_ARG_WITH([initddir],
@@ -46,9 +46,9 @@ AC_SUBST([DEF_INITD_DIR], ["$initddir"])
 
 AC_ARG_WITH([initdlibdir],
 	[AS_HELP_STRING([--with-initdlibdir=DIR],
-	[Set the default initd libdir @<:@${exec_prefix}/lib/initd@:>@])],
+	[Set the default initd libdir @<:@${exec_prefix}/lib/lsb@:>@])],
 	[libinitddir="$withval"],
-	[libinitddir='${exec_prefix}/lib/initd']
+	[libinitddir='${exec_prefix}/lib/lsb']
 )
 AC_SUBST([libinitddir])
 
