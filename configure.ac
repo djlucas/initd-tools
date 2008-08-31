@@ -1,4 +1,4 @@
-AC_INIT([initd-tools],[0.1.1],[dbn.lists@gmail.com])
+AC_INIT([initd-tools],[0.1.2],[dbn.lists@gmail.com])
 AC_CONFIG_AUX_DIR([auto])
 AM_INIT_AUTOMAKE
 
