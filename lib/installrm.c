@@ -134,13 +134,8 @@ static void install_level_links(const initd_list_t *ilp,
 	}
 
 	/* Then install new links */
-	if (sk == SK_START) {
-		for (ip = ilp->first; ip; ip = ip->next)
-			install_new_link(ip, rcp, sk, &sk_prio);
-	} else {
-		for (ip = ilp->last; ip; ip = ip->prev)
-			install_new_link(ip, rcp, sk, &sk_prio);
-	}
+	for (ip = ilp->first; ip; ip = ip->next)
+		install_new_link(ip, rcp, sk, &sk_prio);
 }
 
 static void remove_existing_link(const initd_t *ip,
