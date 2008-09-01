@@ -260,13 +260,15 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		if (!cip) {
 			/* Don't error if the caller said this was an
 			 * optional dependency. */
-			if (!optional) {
+			if (optional)
+				continue;
+			else {
 				fprintf(stderr,
 					"No init script provides %s\n",
 					cstr);
 				success = false;
+				goto out;
 			}
-			goto out;
 		}
 
 		if (rdep_verbose) {
