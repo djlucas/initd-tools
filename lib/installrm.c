@@ -81,6 +81,7 @@ void initd_installrm_set_verbose(bool verbose)
 static void install_level_links(const initd_list_t *ilp,
 			const struct rcpair *rcp, initd_sk_t sk)
 {
+	initd_node_t *inp;
 	initd_t *ip;
 	initd_rc_t rc = rcp->rc;
 	char *dir = rcp->dir;
@@ -116,7 +117,9 @@ static void install_level_links(const initd_list_t *ilp,
 	/* First remove existing links, beginning with the head of the
 	 * list for start links. */
 	if (sk == SK_START) {
-		for (ip = ilp->first; ip; ip = ip->next) {
+		for (inp = ilp->first; inp; inp = inp->next) {
+			ip = inp->initd;
+
 			/* skip script if not active in this level */
 			if (!initd_is_active(ip, rc, KEY_ASTART))
 				continue;
@@ -124,7 +127,9 @@ static void install_level_links(const initd_list_t *ilp,
 			remove_existing_link(ip, rcp, sk);
 		}
 	} else {
-		for (ip = ilp->last; ip; ip = ip->prev) {
+		for (inp = ilp->last; inp; inp = inp->prev) {
+			ip = inp->initd;
+
 			/* skip script if not active in this level */
 			if (!initd_is_active(ip, rc, KEY_ASTOP))
 				continue;
@@ -134,8 +139,8 @@ static void install_level_links(const initd_list_t *ilp,
 	}
 
 	/* Then install new links */
-	for (ip = ilp->first; ip; ip = ip->next)
-		install_new_link(ip, rcp, sk, &sk_prio);
+	for (inp = ilp->first; inp; inp = inp->next)
+		install_new_link(inp->initd, rcp, sk, &sk_prio);
 }
 
 static void remove_existing_link(const initd_t *ip,

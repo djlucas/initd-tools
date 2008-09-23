@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 static void print_sk_list(const initd_list_t *list, initd_sk_t sk)
 {
 	char *startstop;
-	initd_t *ip;
+	initd_node_t *inp;
 
 	switch (sk) {
 	case SK_START:
@@ -64,8 +64,8 @@ static void print_sk_list(const initd_list_t *list, initd_sk_t sk)
 	if (list && list->first) {
 		printf("All deps for %s after removal\n", startstop);
 		printf("Ordered:");
-		for (ip = list->first; ip; ip = ip->next)
-			printf(" %s", ip->name);
+		for (inp = list->first; inp; inp = inp->next)
+			printf(" %s", inp->initd->name);
 		printf("\n");
 	} else {
 		printf("%s list is empty\n", startstop);

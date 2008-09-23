@@ -63,12 +63,12 @@ int main(int argc, char *argv[])
 
 static void print_initd_list(initd_list_t *ilp)
 {
-	initd_t *cur;
+	initd_node_t *cur;
 	if (!ilp) {
 		printf("No initd list provided");
 		return;
 	}
 	printf("initd list contents:\n");
 	for (cur = ilp->first; cur; cur = cur->next)
-		printf(" %s\n", cur->name);
+		printf(" %s\n", cur->initd->name);
 }

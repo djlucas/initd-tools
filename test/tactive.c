@@ -30,13 +30,16 @@ int main(int argc, char *argv[])
 
 static void print_actives(const initd_list_t *ilp)
 {
+	initd_node_t *inp;
 	initd_t *ip;
 	int n, nstr;
 
 	if (!ilp)
 		return;
 
-	for (ip = ilp->first; ip; ip = ip->next) {
+	for (inp = ilp->first; inp; inp = inp->next) {
+		ip = inp->initd;
+
 		printf("%s active start levels:", ip->name);
 		print_rc_string(ip, SK_START);
 

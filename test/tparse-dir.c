@@ -22,9 +22,11 @@ int main(int argc, char *argv[])
 
 static void print_list(const initd_list_t *list)
 {
+	initd_node_t *inp;
 	initd_t *ip;
 	int n;
-	for (ip = list->first; ip; ip = ip->next) {
+	for (inp = list->first; inp; inp = inp->next) {
+		ip = inp->initd;
 		printf("Service %s provides:", ip->name);
 		for (n = 0; n < prov_get_num(ip->prov); n++)
 			printf(" %s", prov_get_prov(ip->prov, n));

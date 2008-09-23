@@ -35,9 +35,6 @@ initd_t *initd_new(const char *name) {
 
 	ip->sdesc = ip->desc = NULL;
 
-	ip->prev = NULL;
-	ip->next = NULL;
-
 	return ip;
 }
 
@@ -103,6 +100,40 @@ initd_t *initd_copy(const initd_t *source)
 	dest->desc = d_string_new(source->desc);
 
 out:
+	return dest;
+}
+
+initd_node_t *initd_node_new(const initd_t *ip)
+{
+	initd_node_t *inp = malloc(sizeof(initd_node_t));
+	if (!inp)
+		error(2, errno, "%s", __FUNCTION__);
+
+	inp->initd = (initd_t *) ip;
+	inp->prev = NULL;
+	inp->next = NULL;
+
+	return inp;
+}
+
+void initd_node_free(initd_node_t *inp)
+{
+	if (inp->initd)
+		initd_free(inp->initd);
+
+	free(inp);
+	inp = NULL;
+}
+
+initd_node_t *initd_node_copy(const initd_node_t *source)
+{
+	initd_node_t *dest;
+
+	if (source)
+		dest = initd_node_new(source->initd);
+	else
+		dest = initd_node_new(NULL);
+
 	return dest;
 }
 

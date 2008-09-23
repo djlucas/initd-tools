@@ -101,15 +101,20 @@ typedef struct initd {
 
 	char *sdesc;        /* Short-Description */
 	char *desc;         /* Description */
-
-	struct initd *prev;
-	struct initd *next;
 } initd_t;
 
-/* linked list of initd types */
+/* The initd node type */
+typedef struct initd_node {
+	initd_t *initd;
+
+	struct initd_node *prev;
+	struct initd_node *next;
+} initd_node_t;
+
+/* linked list of initd_node types */
 typedef struct initd_list {
-	initd_t *first;
-	initd_t *last;
+	initd_node_t *first;
+	initd_node_t *last;
 } initd_list_t;
 
 #endif /* _initd_types_h_ */

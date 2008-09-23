@@ -74,6 +74,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 				initd_sk_t sk, const dep_t *remove)
 {
 	initd_list_t *rmlist = NULL, *all = NULL, *chain = NULL;
+	initd_node_t *inp;
 	initd_t *ip;
 	int n;
 	initd_key_t akey, rmkey;
@@ -126,7 +127,7 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 		initd_set_rc(ip, rmkey, RC_ALL);
 
 		/* Add the initd_t to the rmlist */
-		initd_list_add(rmlist, initd_copy(ip));
+		initd_list_add(rmlist, ip);
 	}
 
 	/* If none of the specified services are currently active, the
@@ -152,8 +153,9 @@ initd_list_t *initd_remove_recurse_deps(initd_list_t *pool,
 
 	/* Append the rmlist to the all list. Since they are marked for
 	 * removal, they won't be reinstalled. */
-	for (ip = rmlist->first; ip; ip = ip->next) {
+	for (inp = rmlist->first; inp; inp = inp->next) {
 		/* Don't duplicate */
+		ip = inp->initd;
 		if (!initd_list_exists_name(all, ip->name))
 			initd_list_add(all, ip);
 	}
@@ -211,6 +213,7 @@ static dep_t *add_all_active(const initd_list_t *pool,
 			const dep_t *init, initd_sk_t sk)
 {
 	dep_t *active;
+	initd_node_t *inp;
 	initd_t *ip;
 	initd_key_t key, rmkey;
 
@@ -226,9 +229,10 @@ static dep_t *add_all_active(const initd_list_t *pool,
 		rmkey = KEY_RMSTOP;
 	}
 
-	for (ip = pool->first; ip; ip = ip->next) {
+	for (inp = pool->first; inp; inp = inp->next) {
 		/* Add services if they are active on any level and
 		 * they are not marked for removal on any levels */
+		ip = inp->initd;
 		if (initd_is_active(ip, RC_ALL, key) &&
 			!initd_is_active(ip, RC_ALL, rmkey))
 			dep_add(active, ip->name);
@@ -318,7 +322,7 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 		}
 
 		/* add it to the chain */
-		initd_list_add(chain_deps, initd_copy(cip));
+		initd_list_add(chain_deps, cip);
 
 		/* process its required dependencies */
 		level++;
@@ -377,7 +381,7 @@ static bool _recurse_deps(initd_list_t *pool, initd_sk_t sk,
 					cstr, cip->name);
 			}
 		}
-		initd_list_add(all_deps, initd_copy(cip));
+		initd_list_add(all_deps, cip);
 		initd_list_pop(chain_deps);
 	}
 
@@ -408,6 +412,7 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 				initd_rc_t rc, initd_sk_t sk,
 				bool required)
 {
+	initd_node_t *inp;
 	initd_t *ip, *dep;
 	dep_t *iprcdep;
 	char *dstr;
@@ -429,7 +434,8 @@ static bool initd_list_verify_level(const initd_list_t *ord,
 	}
 
 	/* Check the deps are valid in this level */
-	for (ip = ord->first; ip; ip = ip->next) {
+	for (inp = ord->first; inp; inp = inp->next) {
+		ip = inp->initd;
 		if (sk == SK_START) {
 			if (required)
 				iprcdep = ip->rstart;

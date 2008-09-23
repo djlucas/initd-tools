@@ -29,7 +29,7 @@ initd_list_t *initd_list_new(void)
 
 void initd_list_free(initd_list_t *ilp)
 {
-	initd_t *cur, *nxt;
+	initd_node_t *cur, *nxt;
 
 	if (!ilp)
 		return;
@@ -37,16 +37,39 @@ void initd_list_free(initd_list_t *ilp)
 	/* free the members of the initd list */
 	for (cur = ilp->first; cur; cur = nxt) {
 		nxt = cur->next;
-		initd_free(cur);
+		initd_node_free(cur);
 	}
 
 	free(ilp);
 	ilp = NULL;
 }
 
+void initd_list_add_node(initd_list_t *ilp, initd_node_t *inp)
+{
+	initd_node_t *cur;
+
+	/* create a new list if necessary */
+	if (!ilp)
+		ilp = initd_list_new();
+
+	/* just return if a NULL node was passed */
+	if (!inp)
+		return;
+
+	cur = ilp->last;
+	if (!cur) {
+		/* this is the first element */
+		ilp->first = inp;
+	} else {
+		cur->next = inp;
+		inp->prev = cur;
+	}
+	ilp->last = inp;
+}
+
 void initd_list_add(initd_list_t *ilp, initd_t *ip)
 {
-	initd_t *cur;
+	initd_node_t *node;
 
 	/* create a new list if necessary */
 	if (!ilp)
@@ -56,31 +79,25 @@ void initd_list_add(initd_list_t *ilp, initd_t *ip)
 	if (!ip)
 		return;
 
-	cur = ilp->last;
-	if (!cur) {
-		/* this is the first element */
-		ilp->first = ip;
-	} else {
-		cur->next = ip;
-		ip->prev = cur;
-	}
-	ilp->last = ip;
+	/* create a new node with this initd and add it to the list*/
+	node = initd_node_new(ip);
+	initd_list_add_node(ilp, node);
 }
 
 /* Remove the last element from an initd list */
 void initd_list_pop(initd_list_t *ilp)
 {
-	initd_t *cur;
+	initd_node_t *cur;
 
 	if (!ilp || !ilp->last)
 		return;
 
 	if (ilp->first == ilp->last) {
-		initd_free(ilp->first);
+		initd_node_free(ilp->first);
 		ilp->first = ilp->last = NULL;
 	} else {
 		cur = ilp->last->prev;
-		initd_free(cur->next);
+		initd_node_free(cur->next);
 		cur->next = NULL;
 		ilp->last = cur;
 	}
@@ -141,15 +158,15 @@ out:
 
 initd_list_t *initd_list_copy(const initd_list_t *source)
 {
-	initd_t *iold, *inew;
+	initd_node_t *iold, *inew;
 	initd_list_t *dest = initd_list_new();
 
 	if (!source)
 		goto out;
 
 	for (iold = source->first; iold; iold = iold->next) {
-		inew = initd_copy(iold);
-		initd_list_add(dest, inew);
+		inew = initd_node_copy(iold);
+		initd_list_add_node(dest, inew);
 	}
 
 out:
@@ -158,15 +175,20 @@ out:
 
 initd_t *initd_list_find_name(const initd_list_t *ilp, const char *name)
 {
+	initd_node_t *inp;
 	initd_t *ip = NULL;
 
 	if (!(name || ilp))
 		goto out;
 
-	for (ip = ilp->first; ip; ip = ip->next) {
+	for (inp = ilp->first; inp; inp = inp->next) {
+		ip = inp->initd;
 		if (strcmp(ip->name, name) == 0)
 			break;
 	}
+
+	if (!inp)
+		ip = NULL;
 out:
 	return ip;
 }
@@ -175,14 +197,16 @@ out:
  * NULL when not found. */
 initd_t *initd_list_find_provides(const initd_list_t *ilp, const char *serv)
 {
-	initd_t *cur;
+	initd_node_t *cur;
+	initd_t *ip;
 
 	if (!ilp)
 		goto err;
 
 	for (cur = ilp->first; cur; cur = cur->next) {
-		if (initd_provides(cur, serv))
-			return cur;
+		ip = cur->initd;
+		if (initd_provides(ip, serv))
+			return ip;
 	}
 
 err:
@@ -258,16 +282,18 @@ out:
 char *initd_list_verify_all(const initd_list_t *ilp)
 {
 	char *missing = NULL;
-	initd_t *cur;
+	initd_node_t *cur;
+	initd_t *ip;
 
 	if (!ilp)
 		goto out;
 
 	for (cur = ilp->first; cur; cur = cur->next) {
-		missing = initd_verify_deps(ilp, cur, KEY_RSTART);
+		ip = cur->initd;
+		missing = initd_verify_deps(ilp, ip, KEY_RSTART);
 		if (missing)
 			break;
-		missing = initd_verify_deps(ilp, cur, KEY_RSTOP);
+		missing = initd_verify_deps(ilp, ip, KEY_RSTOP);
 		if (missing)
 			break;
 	}

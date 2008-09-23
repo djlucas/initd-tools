@@ -21,6 +21,10 @@ extern void initd_free(initd_t *ip);
 extern initd_t *initd_copy(const initd_t *source);
 extern initd_t *initd_parse(const char *path);
 
+extern initd_node_t *initd_node_new(const initd_t *ip);
+extern void initd_node_free(initd_node_t *inp);
+extern initd_node_t *initd_node_copy(const initd_node_t *source);
+
 /* Setters */
 #define initd_add_prov(ip, name) prov_add(ip->prov, name)
 #define initd_add_rstart(ip, name) dep_add(ip->rstart, name)
@@ -41,6 +45,8 @@ extern void initd_add_implicit_prov(initd_t *ip);
 /* List functions */
 extern initd_list_t *initd_list_new(void);
 extern void initd_list_free(initd_list_t *ilp);
+extern void initd_list_add_node(initd_list_t *ilp, initd_node_t *inp);
+#define initd_list_push_node initd_list_add_node
 extern void initd_list_add(initd_list_t *ilp, initd_t *ip);
 #define initd_list_push initd_list_add
 extern void initd_list_pop(initd_list_t *ilp);
