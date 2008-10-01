@@ -21,7 +21,7 @@ extern void initd_free(initd_t *ip);
 extern initd_t *initd_copy(const initd_t *source);
 extern initd_t *initd_parse(const char *path);
 
-extern initd_node_t *initd_node_new(const initd_t *ip);
+extern initd_node_t *initd_node_new(initd_t *ip);
 extern void initd_node_free(initd_node_t *inp);
 extern initd_node_t *initd_node_copy(const initd_node_t *source);
 

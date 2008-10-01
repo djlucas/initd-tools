@@ -101,6 +101,8 @@ typedef struct initd {
 
 	char *sdesc;        /* Short-Description */
 	char *desc;         /* Description */
+
+	unsigned int count; /* Reference count */
 } initd_t;
 
 /* The initd node type */
