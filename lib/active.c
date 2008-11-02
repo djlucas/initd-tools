@@ -129,6 +129,7 @@ static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp)
 	if (!dfd)
 		error(1, errno, "%s", dir);
 
+	errno = 0;
 	while ((de = readdir(dfd))) {
 		if (!de || !de->d_name)
 			continue;
