@@ -16,7 +16,8 @@ char *d_string_new(const char *init)
 
 	new = strdup(init ? init : "");
 	if (!new)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "strdup %s",
+			init ? init : "");
 
 	return new;
 }
@@ -32,7 +33,7 @@ static char *d_string_grow(char *ds, size_t len) {
 
 	ds = realloc(ds, strlen(ds) + len + 1);
 	if (!ds)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "realloc");
 
 out:
 	return ds;

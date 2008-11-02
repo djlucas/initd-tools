@@ -39,13 +39,13 @@ bool initd_installrm_links(const initd_list_t *ilp, const char *dir,
 	/* move to the init.d directory */
 	cwd = get_current_dir_name();
         if (chdir(dir) != 0)
-		error(1, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "chdir %s", dir);
 
 	/* See if we can can find an existing sysinit directory */
 	for (cur = rcsdirs; cur->dir; cur++) {
 		if (stat(cur->dir, &sbuf) != 0) {
 			if (errno != ENOENT)
-				error(1, errno, "%s", cur->dir);
+				error(EXIT_FAILURE, errno, "stat %s", cur->dir);
 		} else {
 			/* found one */
 			break;
@@ -65,7 +65,7 @@ bool initd_installrm_links(const initd_list_t *ilp, const char *dir,
 
 	/* Return to the original directory */
 	if (chdir(cwd) != 0)
-		error(1, errno, "%s", cwd);
+		error(EXIT_FAILURE, errno, "chdir %s", cwd);
 	free(cwd);
 
 	ret = true;
@@ -105,12 +105,12 @@ static void install_level_links(const initd_list_t *ilp,
 			errno = 0;
 			mode_t dirmode = (S_IRWXU|S_IRWXG|S_IRWXO);
 			if (mkdir(dir, dirmode) < 0)
-				error(1, errno, "%s", dir);
+				error(EXIT_FAILURE, errno, "mkdir %s", dir);
 			/* Change to the created directory */
 			if (chdir(dir) < 0)
-				error(1, errno, "%s", dir);
+				error(EXIT_FAILURE, errno, "chdir %s", dir);
 		} else {
-			error(1, errno, "%s", dir);
+			error(EXIT_FAILURE, errno, "chdir %s", dir);
 		}
 	}
 
@@ -176,7 +176,8 @@ static void remove_existing_link(const initd_t *ip,
 			}
 			if (remove(path) != 0) {
 				if (errno != ENOENT)
-					error(1, errno, "%s", path);
+					error(EXIT_FAILURE, errno,
+						"remove %s", path);
 			}
 
 			/* Clear the active bit for this level */
@@ -235,7 +236,7 @@ static void install_new_link(const initd_t *ip, const struct rcpair *rcp,
 			path, target, bdir);
 	}
 	if (symlink(target, path) < 0)
-		error(1, errno, "%s -> %s", path, target);
+		error(EXIT_FAILURE, errno, "symlink %s -> %s", path, target);
 
 	/* Set the active bit for this level */
 	initd_set_rc(ip, akey, rc);

@@ -60,7 +60,7 @@ initd_t *initd_parse(const char *path)
 	}
 
 	if (ferror(ifd))
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "fgets %s", path);
 
 	initd_close(ifd);
 
@@ -83,7 +83,7 @@ FILE *initd_open(const char *path)
 
 	fd = fopen(path, "r");
 	if (!fd)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "fopen %s", path);
 
 out:
 	return fd;
@@ -95,7 +95,7 @@ static void initd_close(FILE *ifd)
 		return;
 
 	if (fclose(ifd) != 0)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "fclose %s", path);
 }
 
 static initd_key_t initd_parse_line(initd_t *ip, const char *line,
@@ -175,7 +175,7 @@ static initd_key_t initd_parse_line(initd_t *ip, const char *line,
 	/* Store the key string */
 	kstring = strndup(tmp, pos - tmp);
 	if (!kstring)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "strndup");
 
 	/* Strip any trailing spaces from the key string */
 	for (n = strlen(kstring) - 1; n >= 0; n--) {
@@ -357,7 +357,7 @@ static void initd_parse_line_tokens(initd_t *ip, const char *line,
 		/* reached end of line or space following token */
 		tok = strndup(a, b-a);
 		if (!tok)
-			error(2, errno, "%s", __FUNCTION__);
+			error(EXIT_FAILURE, errno, "strndup");
 
 		switch(key) {
 		case KEY_DSTART:

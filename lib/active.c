@@ -36,7 +36,7 @@ void initd_list_set_actives(initd_list_t *ilp, const char *dir)
 	/* Change to the init.d directory */
 	cwd = get_current_dir_name();
 	if (chdir(dir) != 0)
-		error(1, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "chdir %s", dir);
 
 	/* Check the various sysinit directories, stopping after the
 	 * first one. */
@@ -52,7 +52,7 @@ void initd_list_set_actives(initd_list_t *ilp, const char *dir)
 
 	/* Return to the original directory */
 	if (chdir(cwd) != 0)
-		error(1, errno, "%s", cwd);
+		error(EXIT_FAILURE, errno, "chdir %s", cwd);
 	free(cwd);
 }
 
@@ -121,13 +121,13 @@ static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp)
 			errno = 0;
 			return false;
 		} else {
-			error(1, errno, "%s", dir);
+			error(EXIT_FAILURE, errno, "chdir %s", dir);
 		}
 	}
 
 	dfd = opendir(".");
 	if (!dfd)
-		error(1, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "opendir %s", dir);
 
 	errno = 0;
 	while ((de = readdir(dfd))) {
@@ -146,10 +146,10 @@ static bool read_dir_symlinks(initd_list_t *ilp, const struct rcpair *rcp)
 
 	/* if errno is set, readdir had issues */
 	if (errno)
-		error(1, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "readdir %s", dir);
 
 	if (closedir(dfd) != 0)
-		error(1, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "closedir %s", dir);
 
 	return true;
 }
@@ -161,7 +161,7 @@ static char *rel_readlink(const char *path)
 	ssize_t tlen;
 
 	if (lstat(path, &ls) != 0)
-		error(1, errno, "%s", path);
+		error(EXIT_FAILURE, errno, "lstat %s", path);
 
 	if (!S_ISLNK(ls.st_mode)) {
 		if (active_verbose) {
@@ -176,7 +176,7 @@ static char *rel_readlink(const char *path)
 
 	tlen = readlink(path, target, sizeof(target));
 	if (tlen < 0)
-		error(1, errno, "%s", path);
+		error(EXIT_FAILURE, errno, "readlink %s", path);
 
 	/* append a null byte if target was truncated */
 	if (tlen == PATH_MAX)
@@ -255,9 +255,9 @@ static void add_active_link(const initd_t *ip, const char *link,
 	pathlen = strlen(rcp->dir) + strlen(link) + 2;
 	fullpath = malloc(sizeof(char) * pathlen);
 	if (!fullpath)
-		error(2, errno, "malloc");
+		error(EXIT_FAILURE, errno, "malloc");
 	if (snprintf(fullpath, pathlen, "%s/%s", rcp->dir, link) >= pathlen)
-		error(2, errno, "snprintf");
+		error(EXIT_FAILURE, errno, "snprintf");
 
 	switch (key) {
 	case KEY_ASTART:

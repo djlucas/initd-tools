@@ -14,7 +14,7 @@ static initd_rc_t *initd_get_rc_from_key(const initd_t *ip,
 initd_t *initd_new(const char *name) {
 	initd_t *ip = malloc(sizeof(initd_t));
 	if (!ip)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "malloc initd_t");
 
 	ip->name = d_string_new(name);
 
@@ -113,7 +113,7 @@ initd_node_t *initd_node_new(initd_t *ip)
 {
 	initd_node_t *inp = malloc(sizeof(initd_node_t));
 	if (!inp)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "malloc initd_node_t");
 
 	inp->initd = ip;
 	inp->prev = NULL;

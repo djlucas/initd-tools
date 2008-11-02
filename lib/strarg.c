@@ -11,11 +11,11 @@ strarg_t *strarg_new(void)
 {
 	strarg_t *sp = malloc(sizeof(strarg_t));
 	if (!sp)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "malloc");
 
 	sp->str = malloc(sizeof(char *));
 	if (!sp)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "malloc");
 
 	*(sp->str) = NULL;
 	sp->nstr = 0;
@@ -47,7 +47,7 @@ void strarg_add(strarg_t *sp, const char *s)
 
 	sp->str = realloc(sp->str, (sp->nstr + 2) * sizeof(char *));
 	if (!sp)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "realloc");
 
 	sp->str[(sp->nstr)++] = d_string_new(s);
 	sp->str[sp->nstr] = NULL;
@@ -69,7 +69,7 @@ void strarg_pop(strarg_t *sp)
 	/* resize for one less element */
 	sp->str = realloc(sp->str, len * sizeof(char *));
 	if (!sp->str)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "realloc");
 
 	sp->str[--(sp->nstr)] = NULL;
 }

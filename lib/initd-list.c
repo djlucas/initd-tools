@@ -19,7 +19,7 @@ initd_list_t *initd_list_new(void)
 {
 	initd_list_t *ilp = malloc(sizeof(initd_list_t));
 	if (!ilp)
-		error(2, errno, "%s", __FUNCTION__);
+		error(EXIT_FAILURE, errno, "malloc initd_list_t");
 
 	ilp->first = NULL;
 	ilp->last = NULL;
@@ -117,7 +117,7 @@ initd_list_t *initd_list_from_dir(const char *dir)
 
 	dfd = opendir(dir);
 	if (!dfd)
-		error(2, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "opendir %s", dir);
 
 	errno = 0;
 	while ((de = readdir(dfd))) {
@@ -128,11 +128,12 @@ initd_list_t *initd_list_from_dir(const char *dir)
 
 		plen = snprintf(ip_path, PATH_MAX, "%s/%s", dir, de->d_name);
 		if (plen < 0)
-			error(2, errno, "%s", de->d_name);
+			error(EXIT_FAILURE, errno, "snprintf %s/%s",
+				dir, de->d_name);
 
 		struct stat ip_buf;
 		if (stat(ip_path, &ip_buf) < 0)
-			error(2, errno, "%s", ip_path);
+			error(EXIT_FAILURE, errno, "stat %s", ip_path);
 		if (!S_ISREG(ip_buf.st_mode))
 			continue;
 
@@ -144,11 +145,11 @@ initd_list_t *initd_list_from_dir(const char *dir)
 	}
 
 	/* if errno is set, readdir had issues */
-	if (errno)
-		error(2, errno, "%s", dir);
+	if (!de && errno != 0)
+		error(EXIT_FAILURE, errno, "readdir %s", dir);
 
 	if (closedir(dfd) != 0)
-		error(2, errno, "%s", dir);
+		error(EXIT_FAILURE, errno, "closedir %s", dir);
 
 	/* Set the active field for all scripts */
 	initd_list_set_actives(ilp, dir);
