@@ -102,6 +102,7 @@ initd_list_t *initd_list_from_dir(const char *dir)
 	if (!dfd)
 		error(2, errno, "%s", dir);
 
+	errno = 0;
 	while ((de = readdir(dfd))) {
 		char ip_path[PATH_MAX];
 		int plen;
