@@ -95,7 +95,7 @@ static void initd_close(FILE *ifd)
 		return;
 
 	if (fclose(ifd) != 0)
-		error(EXIT_FAILURE, errno, "fclose %s", path);
+		error(EXIT_FAILURE, errno, "fclose");
 }
 
 static initd_key_t initd_parse_line(initd_t *ip, const char *line,
